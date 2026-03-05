@@ -1,13 +1,13 @@
-package com.example;
+package com.example.slotserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-class RestServiceApplication {
+class SlotServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(RestServiceApplication.class, args);
+        SpringApplication.run(SlotServerApplication.class, args);
     }
 
 }
