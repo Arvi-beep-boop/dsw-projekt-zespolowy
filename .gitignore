@@ -13,6 +13,13 @@ out/
 *.log
 *.class
 
+# ========================
+# Any other IDE colleagues may use
+# ========================
+*.vs
+.vs/
+.vscode/
+
 # BlueJ files
 *.ctxt
 
