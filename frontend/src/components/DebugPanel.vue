@@ -1,12 +1,13 @@
 <script setup>
 defineProps({
-  response: Object
+  response: Object,
+  request: Object
 });
 </script>
 
 <template>
   <div class="debug-panel">
-    <div class="debug-section">
+    <div class="debug-section response-block">
       <div class="label">GRID:</div>
       <div class="grid-row" v-for="(row, i) in response?.grid" :key="i">
         [ <span class="val">{{ row[0] }}</span>, <span class="val">{{ row[1] }}</span>, <span class="val">{{ row[2] }}</span> ]
@@ -26,6 +27,13 @@ defineProps({
         <div>CASH: <span class="val">{{ line.win }}</span></div>
       </div>
     </div>
+
+    <div class="debug-section request-block" v-if="request">
+      <br>
+      <div class="label">SPIN REQUEST:</div>
+      <div>bet: <span class="val">{{ request.bet }}</span></div>
+    </div>
+    
   </div>
 </template>
 

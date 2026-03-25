@@ -13,6 +13,18 @@ const selectedBet = ref(1);
 const selectBet = (amount) => {
   selectedBet.value = amount;
 };
+
+// Zmienna trzymająca dane "wysłane" do backendu (domyślnie null)
+const lastRequest = ref(null);
+
+const sendSpinRequest = () => {
+  // Zapisujemy w zmiennej paczkę danych, którą "wysyłamy"
+  lastRequest.value = { 
+    bet: selectedBet.value 
+  };
+  console.log("Wysłano żądanie SPIN z betem:", selectedBet.value);
+};
+
 </script>
 
 <template>
@@ -27,7 +39,7 @@ const selectBet = (amount) => {
           <img src="/assets/coin.png" alt="coin" class="coin-icon" />
         </div>
 
-        <button class="spin-btn">SPIN</button>
+        <button class="spin-btn" @click="sendSpinRequest">SPIN</button>
 
         <div class="hud-bet">
           <button 
@@ -44,7 +56,10 @@ const selectBet = (amount) => {
 
     </div>
 
-    <DebugPanel :response="mockSpinData" />
+    <DebugPanel
+      :response="mockSpinData"
+      :request="lastRequest"
+    />
 
   </div>
 </template>
