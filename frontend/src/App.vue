@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue';
 import PhaserGame from './PhaserGame.vue';
+import DebugPanel from './components/DebugPanel.vue';
+import { mockSpinData } from './mock/spinResponse.js';
 
 const phaserRef = ref();
 
@@ -41,6 +43,9 @@ const selectBet = (amount) => {
       </div>
 
     </div>
+
+    <DebugPanel :response="mockSpinData" />
+
   </div>
 </template>
 
@@ -172,4 +177,5 @@ W tym obszarze znajdują się również Creditsy, Spin i Bety*/
   box-shadow: 0 2px #72621c;
   transform: translateX(-50%) scale(1.10) translateY(6px);
 }
+
 </style>
