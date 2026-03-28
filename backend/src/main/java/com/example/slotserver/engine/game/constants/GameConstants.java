@@ -18,18 +18,19 @@ public final class GameConstants {
             {2, 1, 0}
     };
 
-    public static final Map<Integer, Integer> PAY_TABLE = Map.ofEntries(
-            Map.entry(WILD, 100),
-            Map.entry(H1, 50),
-            Map.entry(H2, 25),
-            Map.entry(M1, 20),
-            Map.entry(M2, 15),
-            Map.entry(L1, 10),
-            Map.entry(L2, 5),
-            Map.entry(L3, 5)
+    public static final Map<Integer, Map<Integer, Integer>> PAY_TABLE = Map.ofEntries(
+            Map.entry(WILD, Map.of(3, 100)),
+            Map.entry(H1,   Map.of(3, 50)),
+            Map.entry(H2,   Map.of(3, 25)),
+            Map.entry(M1,   Map.of(3, 20)),
+            Map.entry(M2,   Map.of(3, 15)),
+            Map.entry(L1,   Map.of(3, 10)),
+            Map.entry(L2,   Map.of(3, 5)),
+            Map.entry(L3,   Map.of(3, 5))
     );
 
     public static final int NUM_FREE_SPINS = 5;
+    public static final int NUM_SCATTERS_TO_TRIGGER_FS = 3;
 
     public static final int DEFAULT_BET = 10;
 }

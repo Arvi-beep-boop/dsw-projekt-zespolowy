@@ -1,30 +1,89 @@
 package com.example.slotserver.engine.core;
 
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
-public class WinLineCalculator {
+public final class WinLineCalculator {
 
-    private final int width;
     private final int[][] winLines;
     private final int wild;
-    private final int scatter;
-    private final Map<Integer, Integer> payTable;
+    private final Set<Integer> excluded;
+    private final Map<Integer, Map<Integer, Integer>> payTable;
 
 
-    public WinLineCalculator(final int width, final int[][] winLines,  Map<Integer, Integer> payTable, final int wild, final int scatter) {
-        this.width = width;
+    public WinLineCalculator(final int[][] winLines, Map<Integer, Map<Integer, Integer>> payTable, final int wild, final int... excluded) {
         this.winLines = winLines;
         this.payTable = payTable;
         this.wild = wild;
-        this.scatter = scatter;
+        this.excluded = new HashSet<>();
+        for (int e : excluded) {
+            this.excluded.add(e);
+        }
     }
 
-    public void findLineWins() {
+    public List<WinLineData> calculateLineWins(final Grid grid) {
+        List<WinLineData> results = new ArrayList<>();
 
-        // for each winline
-        // map symbols to binary code and store them in int[width]
-        // if & operation on them is != 0 then it is a match
+
+        for (int lineId = 0; lineId < winLines.length; lineId++) {
+            int[] line = winLines[lineId];
+
+            int wildCount = 0;
+            int activeSymbol = -1;
+            int activeMatchCount = 0;
+
+            for (int reel = 0; reel < grid.width(); reel++) {
+                int symbol = grid.getSymbolAt(line[reel], reel);
+
+                if (excluded.contains(symbol)) break;
+
+                // Track Pure Wilds
+                if (symbol == wild && activeSymbol == -1) {
+                    wildCount++;
+                }
+
+                // Track Substituted Win
+                if (activeSymbol == -1) {
+                    if (symbol != wild) {
+                        activeSymbol = symbol;
+                    }
+                    activeMatchCount++;
+                } else if (symbol == activeSymbol || symbol == wild) {
+                    activeMatchCount++;
+                } else {
+                    break;
+                }
+            }
+
+            // Evaluate both options and pick the best
+            WinLineData bestWin = null;
+
+            // Option A: Pure Wild Win
+            int wildPay = getPayout(wild, wildCount);
+            bestWin = new WinLineData(wild, wildCount, lineId, wildPay);
+
+            // Option B: Substituted Win (only if better than Wild win)
+            if (activeSymbol != -1) {
+                int subPay = getPayout(activeSymbol, activeMatchCount);
+                if (subPay > bestWin.getMult()) {
+                    bestWin = new WinLineData(activeSymbol, activeMatchCount, lineId, subPay);
+                }
+            }
+
+            if (bestWin.getMult() > 0) {
+                results.add(bestWin);
+            }
+        }
+        return results;
+    }
+
+    private int getPayout(final int symbol, final int length) {
+        Map<Integer, Integer> payouts = payTable.get(symbol);
+
+        if (payouts == null) {
+            throw new IllegalArgumentException("Symbol " + symbol + " not found in payout table");
+        }
+
+        return Math.divideExact(payouts.getOrDefault(length, 0), winLines.length);
     }
 
 }

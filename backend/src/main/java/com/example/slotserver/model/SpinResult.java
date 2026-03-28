@@ -1,16 +1,21 @@
 package com.example.slotserver.model;
 
+import com.example.slotserver.engine.core.GameMode;
+import com.example.slotserver.engine.core.Grid;
+import com.example.slotserver.engine.core.WinLineData;
+
+import java.util.List;
+
 public class SpinResult {
 
-    public int[][] grid;
-    public int win;
+    public GameMode gameMode;
+    public Grid grid;
+    public long win;
+    public List<WinLineData> winLineWinData;
 
-    public SpinResult() {
-        this.grid = new int[][]{
-                {1, 2, 3},
-                {6, 3, 2},
-                {4, 1, 1}
-        };
-        this.win = 20;
-    }
+    public long cumulativeWinMoney;
+    public int numFreeSpinsAwarded;
+    public int numFreeSpinsPlayed;
+    public int totalNumberFreeSpins;
+
 }

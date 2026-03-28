@@ -4,6 +4,8 @@ import com.example.slotserver.engine.SlotEngine;
 import com.example.slotserver.model.SpinResult;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SpinService {
 
@@ -13,7 +15,7 @@ public class SpinService {
         this.slotEngine = slotEngine;
     }
 
-    public SpinResult spin() {
+    public List<SpinResult> spin() {
         return slotEngine.spin();
     }
 }
