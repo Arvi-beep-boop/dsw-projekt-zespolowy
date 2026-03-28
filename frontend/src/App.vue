@@ -1,32 +1,42 @@
+<script setup>
+import { ref } from 'vue';
+import StatBox from './components/StatBox.vue';
+import BetMenu from './components/BetMenu.vue';
+
+// Stan gry
+const balance = ref(1000);
+const win = ref(0);
+const currentBet = ref(1);
+const availableBets = [1, 2, 3];
+
+// Obsługa zmiany zakładu z komponentu BetMenu
+const handleBetChange = (newAmount) => {
+  currentBet.value = newAmount;
+};
+</script>
+
 <template>
   <div class="app-wrapper">
     <div class="machine-container">
       
       <div class="top-section">
-        <div class="game-section"></div>
+        <div class="game-section">
+          </div>
+        
         <div class="spin-section">
-          <button class="bet-main-btn">BET</button>
+          <BetMenu 
+            :currentBet="currentBet" 
+            :availableBets="availableBets"
+            @updateBet="handleBetChange" 
+          />
         </div>
       </div>
 
       <div class="bottom-section">
         <div class="bottom-left">
-          
-          <div class="stat-box">
-            <div class="stat-label">BALANCE</div>
-            <div class="value-frame">1000.00 €</div>
-          </div>
-
-          <div class="stat-box">
-            <div class="stat-label">WIN</div>
-            <div class="value-frame">0.00 €</div>
-          </div>
-
-          <div class="stat-box">
-            <div class="stat-label">BET</div>
-            <div class="value-frame">10.00</div>
-          </div>
-
+          <StatBox label="BALANCE" :value="balance" unit="€" />
+          <StatBox label="WIN" :value="win" unit="€" />
+          <StatBox label="BET" :value="currentBet" unit="€" />
         </div>
 
         <div class="bottom-right">
@@ -38,92 +48,113 @@
   </div>
 </template>
 
-<style scoped>
+<style>
+:root {
+  /* --- TŁA --- */
+  --bg-app: #111111;
+  --bg-machine: #222222;
+  --bg-panel: #1a1a1a;
+
+  /* --- ZŁOTO (Główny Bohater) --- */
+  --gold-light: #ffdf00; 
+  --gold-main: #edb406; 
+  --gold-dark: #b8860b; 
+  --gold-border: #ffd700; 
+
+  /* --- TEKST --- */
+  --text-dark: #1a1a1a; 
+  --text-light: #ffffff;
+  --text-muted: #aaaaaa;
+
+  /* --- EFEKTY --- */
+  --shadow-gold-btn: 0 0.4em 0 var(--gold-dark); /* Zamienione na em */
+  --border-gold-heavy: 0.2em solid var(--gold-border); /* Zamienione na em */
+}
+
+/* --- RESETY I UKŁAD --- */
+* {
+  box-sizing: border-box; /* Ważne, żeby ramki nie psuły szerokości! */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
 .app-wrapper {
-  background-color: #111;
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
+  background-color: var(--bg-app);
+  color: var(--text-light);
   font-family: sans-serif;
 }
 
+/* Główny kontener - 0px, pełna elastyczność */
 .machine-container {
-  width: 1024px;
-  height: 768px;
+  width: 80vw;
+  max-width: 60em;
+  aspect-ratio: 4 / 3;
   display: flex;
   flex-direction: column;
-  background-color: #222;
-  font-size: 16px; 
-  border: 0.15em solid #555;
+  background-color: var(--bg-machine);
+  font-size: 1em; 
+  border: 1px solid #555; /* Ramka zewnętrzna 1px */
 }
 
+/* --- SEKCJE GŁÓWNE --- */
 .top-section { height: 85%; display: flex; }
 .bottom-section { height: 15%; display: flex; }
 
-.game-section { width: 85%; border: 0.06em solid #444; }
+/* 1. LEWA GÓRA */
+.game-section { 
+  width: 85%; 
+  border-right: 1px solid #555; 
+  border-bottom: 1px solid #555; 
+}
 
+/* 2. PRAWA GÓRA */
 .spin-section {
   width: 15%;
-  border: 0.06em solid #444;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  padding-bottom: 2%;
+  border-bottom: 1px solid #555; 
 }
 
+/* 3. LEWY DÓŁ */
 .bottom-left {
   width: 85%;
-  border: 0.06em solid #444;
+  background-color: var(--bg-panel);
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+  border-right: 1px solid #555; 
 }
 
+/* 4. PRAWY DÓŁ */
 .bottom-right {
   width: 15%;
-  border: 0.06em solid #444;
+  background-color: var(--bg-machine);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.stat-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 28%;
-  gap: 0.4em;
-}
-
-.stat-label { font-size: 0.8em; color: #aaa; }
-
-.value-frame {
-  width: 100%;
-  aspect-ratio: 4 / 1;
-  border: 0.06em solid #444;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2em;
-}
-
-.bet-main-btn {
-  width: 60%;
-  aspect-ratio: 2 / 1;
-  font-size: 1em;
-  cursor: pointer;
-  margin-bottom: 15%;
-}
-
+/* --- PRZYCISK SPIN (Tymczasowy styl) --- */
 .spin-btn {
   width: 70%;
   aspect-ratio: 1 / 1;
   font-size: 1.1em;
   font-weight: bold;
   cursor: pointer;
+  border-radius: 50%;
+  background-color: var(--bg-panel);
+  color: var(--gold-main);
+  border: 1px solid var(--gold-main);
 }
 </style>
