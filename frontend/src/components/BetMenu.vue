@@ -1,51 +1,68 @@
-<template>
-  <div :class="['bet-wrapper', { 'is-open': isBetMenuOpen }]" @mouseleave="isBetMenuOpen = false">
-    
-    <div v-if="isBetMenuOpen" class="bet-dropdown">
-      <div 
-        v-for="bet in availableBets" 
-        :key="bet" 
-        class="bet-option"
-        @click="selectBet(bet)"
-      >
-        {{ bet }}
-      </div>
-    </div>
-
-    <button 
-        :class="['btn-gold-3d', 'bet-main-btn', { 'is-open': isBetMenuOpen }]" 
-        @click="toggleBetMenu"
-    >
-        BET
-    </button>
-
-  </div>
-</template>
-
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
-// Odbieramy dane z App.vue (dostępne zakłady i aktualny wybór)
 const props = defineProps(['currentBet', 'availableBets']);
-
-// Definiujemy zdarzenie, którym "krzykniemy" do App.vue, że zakład się zmienił
 const emit = defineEmits(['updateBet']);
 
-// Stan otwarcia menu zostaje tutaj, bo App.vue nie musi o tym wiedzieć
 const isBetMenuOpen = ref(false);
+const betWrapper = ref(null);
 
 const toggleBetMenu = () => {
   isBetMenuOpen.value = !isBetMenuOpen.value;
 };
 
 const selectBet = (amount) => {
-  emit('updateBet', amount); // Wysyłamy nowy zakład do App.vue
-  isBetMenuOpen.value = false; // Zamykamy menu
+  emit('updateBet', amount);
+  isBetMenuOpen.value = false;
 };
+
+// NOWA FUNKCJA - Ignoruje ucieczkę na SPIN, ale zamyka na wszystko inne
+const handleMouseLeave = (event) => {
+  if (event.relatedTarget && event.relatedTarget.closest('.spin-btn')) {
+    return; // Zostawiamy menu otwarte
+  }
+  isBetMenuOpen.value = false;
+};
+
+// Zamykanie kliknięciem (np. jak klikniesz w SPIN)
+const handleGlobalClick = (event) => {
+  if (isBetMenuOpen.value) {
+    if (!event.target.closest('.bet-option') && !event.target.closest('.bet-main-btn')) {
+      isBetMenuOpen.value = false;
+    }
+  }
+};
+
+onMounted(() => { window.addEventListener('click', handleGlobalClick); });
+onUnmounted(() => { window.removeEventListener('click', handleGlobalClick); });
 </script>
 
+<template>
+  <div 
+    ref="betWrapper" 
+    :class="['bet-wrapper', { 'is-open': isBetMenuOpen }]" 
+    @mouseleave="handleMouseLeave"
+  >
+    <div v-if="isBetMenuOpen" class="bet-dropdown">
+      <div 
+        v-for="bet in availableBets" :key="bet" 
+        class="bet-option" @click="selectBet(bet)"
+      >
+        {{ bet }}
+      </div>
+    </div>
+
+    <button 
+      :class="['btn-gold-3d', 'bet-main-btn', { 'is-open': isBetMenuOpen }]" 
+      @click.stop="toggleBetMenu"
+    >
+      BET
+    </button>
+  </div>
+</template>
+
 <style scoped>
-/* Przeniesione style z App.vue z dodanymi zmiennymi z roota */
+/* PRZYWRÓCONE TWOJE ORYGINALNE STYLE */
 .bet-wrapper {
   position: relative; 
   width: 100%;
@@ -53,9 +70,6 @@ const selectBet = (amount) => {
   flex-direction: column;
   align-items: center;
   margin-bottom: 5%; 
-  /* SERWIS - Wyświetla pole hitboxa od przycisku bet
-  background-color: rgba(255, 0, 0, 0.1) !important; 
-  */
   z-index: 50;
 }
 
@@ -70,9 +84,6 @@ const selectBet = (amount) => {
   width: 100%; 
   z-index: 10;
   align-items: center;
-  /* SERWIS - Wyświetla pole hitboxa od wyświetlanej listy bet
-  outline: 2px solid blue !important;
-  */
 }
 
 .bet-option {
@@ -81,8 +92,6 @@ const selectBet = (amount) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  
-  /* Teraz też są złote od startu! */
   background-color: var(--btn-gold-bg); 
   color: white;
   border: 0.15em solid var(--btn-gold-border);
@@ -96,77 +105,59 @@ const selectBet = (amount) => {
 .bet-option:hover {
   background-color: var(--btn-gold-hover);
   border-color: var(--btn-gold-border-hover);
-  box-shadow: 0 0 1.2em var(--btn-gold-glow); /* To jest to złote świecenie! */
-  transform: scale(1.15); /* Niech lekko wyskoczy do przodu */
+  box-shadow: 0 0 1.2em var(--btn-gold-glow);
+  transform: scale(1.15);
 }
 
-/* GŁÓWNY PRZYCISK BET */
 .bet-main-btn {
   width: 50%;
   aspect-ratio: 2 / 1;
   border-radius: 0.4em;
   font-size: 1em;
-  /* Wygląd, kolory, ramki, cienie i animacje lecą z .btn-gold-3d w main.css */
 }
 
-/* --- NADPISYWANIE GLOBALA DLA EFEKTU "SZTYWNEGO" KLIKNIĘCIA --- */
-
+/* BLOKADA POWIĘKSZANIA (ZGODNIE Z TWOIM ŻYCZENIEM) */
 .bet-main-btn:hover {
-  /* Blokujemy powiększanie (scale) z main.css */
   transform: none; 
 }
 
 .bet-main-btn:active {
-  /* Tylko ruch w dół (translateY) - zasłania cień bez kurczenia się */
   transform: translateY(0.15em); 
 }
 
 .bet-main-btn.is-open {
-  /* Przycisk zostaje na dole i "pożera" cień */
   transform: translateY(0.15em); 
   box-shadow: none;
-  
-  /* Resetujemy kolory do bazowych (wyłączamy świecenie) */
   border-color: var(--btn-gold-border);
   color: var(--btn-gold-text);
   text-shadow: none;
   cursor: default;
 }
 
-/* Blokujemy jakiekolwiek zmiany na hoverze, gdy menu jest otwarte */
 .bet-main-btn.is-open:hover {
-  background-color: var(--btn-gold-bg); /* Nie rozjaśnia się */
-  box-shadow: none;                    /* Nie dostaje glow wokół przycisku */
-  text-shadow: none;                   /* Nie dostaje glow na tekście */
+  background-color: var(--btn-gold-bg);
+  box-shadow: none;
+  text-shadow: none;
   border-color: var(--btn-gold-border);
-  transform: translateY(0.15em);       /* Zostaje w tej samej dolnej pozycji */
+  transform: translateY(0.15em);
 }
 
+/* TWOJA RAMKA HITBOX */
 .bet-wrapper::before {
   content: '';
   position: absolute;
-  
-  /* Centrowanie względem przycisku BET */
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-
-  /* Rozmiar kwadratu - zwiększony do 24em, żeby wystawał nad listę */
   width: 24em; 
   height: 24em;
-
-  /* WAŻNE: Musi być "niewidoczny", ale łapać myszkę */
   z-index: -1; 
   display: none;
   pointer-events: all; 
-
-  /* SERWIS - Wyświetla pole hitboxa dla myszki kiedy opuszczasz kliknięty bet
-  background: rgba(0, 255, 0, 0.1); 
-  border: 2px dashed rgba(0, 255, 0, 0.5);
-  */
+  /* Debug: background: rgba(0, 255, 0, 0.1); */
 }
 
 .bet-wrapper.is-open::before {
-  display: block; /* <--- POJAWIA SIĘ I ŁAPIE MYSZKĘ */
+  display: block;
 }
 </style>
