@@ -1,5 +1,5 @@
 <template>
-  <div class="bet-wrapper">
+  <div :class="['bet-wrapper', { 'is-open': isBetMenuOpen }]" @mouseleave="isBetMenuOpen = false">
     
     <div v-if="isBetMenuOpen" class="bet-dropdown">
       <div 
@@ -53,6 +53,10 @@ const selectBet = (amount) => {
   flex-direction: column;
   align-items: center;
   margin-bottom: 5%; 
+  /* SERWIS - Wyświetla pole hitboxa od przycisku bet
+  background-color: rgba(255, 0, 0, 0.1) !important; 
+  */
+  z-index: 50;
 }
 
 .bet-dropdown {
@@ -66,6 +70,9 @@ const selectBet = (amount) => {
   width: 100%; 
   z-index: 10;
   align-items: center;
+  /* SERWIS - Wyświetla pole hitboxa od wyświetlanej listy bet
+  outline: 2px solid blue !important;
+  */
 }
 
 .bet-option {
@@ -133,5 +140,33 @@ const selectBet = (amount) => {
   text-shadow: none;                   /* Nie dostaje glow na tekście */
   border-color: var(--btn-gold-border);
   transform: translateY(0.15em);       /* Zostaje w tej samej dolnej pozycji */
+}
+
+.bet-wrapper::before {
+  content: '';
+  position: absolute;
+  
+  /* Centrowanie względem przycisku BET */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  /* Rozmiar kwadratu - zwiększony do 24em, żeby wystawał nad listę */
+  width: 24em; 
+  height: 24em;
+
+  /* WAŻNE: Musi być "niewidoczny", ale łapać myszkę */
+  z-index: -1; 
+  display: none;
+  pointer-events: all; 
+
+  /* SERWIS - Wyświetla pole hitboxa dla myszki kiedy opuszczasz kliknięty bet
+  background: rgba(0, 255, 0, 0.1); 
+  border: 2px dashed rgba(0, 255, 0, 0.5);
+  */
+}
+
+.bet-wrapper.is-open::before {
+  display: block; /* <--- POJAWIA SIĘ I ŁAPIE MYSZKĘ */
 }
 </style>

@@ -75,8 +75,17 @@ const handleBetChange = (newAmount) => {
 }
 
 /* --- SEKCJE GŁÓWNE --- */
-.top-section { height: 85%; display: flex; }
-.bottom-section { height: 15%; display: flex; background-color: transparent; }
+.top-section { 
+  height: 85%; 
+  display: flex; 
+}
+
+.bottom-section { 
+  height: 15%; 
+  display: flex; 
+  background-color: transparent; 
+  position: relative;
+}
 
 /* 1. LEWA GÓRA */
 .game-section { 
@@ -94,6 +103,7 @@ const handleBetChange = (newAmount) => {
   justify-content: flex-end;
   align-items: center;
   border-bottom: 1px solid #555; 
+  position: relative;
 }
 
 /* 3. LEWY DÓŁ */
@@ -115,9 +125,11 @@ const handleBetChange = (newAmount) => {
 
 /* --- SPECYFICZNE WYMIARY SPIN --- */
 .spin-btn {
+  position: relative;
   width: 65%;
   aspect-ratio: 1 / 1;
   border-radius: 50%; 
   font-size: 1.6em; 
+  z-index: 100;
 }
 </style>
