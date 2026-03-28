@@ -40,7 +40,7 @@ const handleBetChange = (newAmount) => {
         </div>
 
         <div class="bottom-right">
-          <button class="spin-btn">SPIN</button>
+          <button class="btn-gold-3d spin-btn">SPIN</button>
         </div>
       </div>
 
@@ -48,38 +48,8 @@ const handleBetChange = (newAmount) => {
   </div>
 </template>
 
-<style>
-:root {
-  /* --- TŁA --- */
-  --bg-app: #111111;
-  --bg-machine: #222222;
-  --bg-panel: #1a1a1a;
-
-  /* --- ZŁOTO (Główny Bohater) --- */
-  --gold-light: #ffdf00; 
-  --gold-main: #edb406; 
-  --gold-dark: #b8860b; 
-  --gold-border: #ffd700; 
-
-  /* --- TEKST --- */
-  --text-dark: #1a1a1a; 
-  --text-light: #ffffff;
-  --text-muted: #aaaaaa;
-
-  /* --- EFEKTY --- */
-  --shadow-gold-btn: 0 0.4em 0 var(--gold-dark); /* Zamienione na em */
-  --border-gold-heavy: 0.2em solid var(--gold-border); /* Zamienione na em */
-}
-
-/* --- RESETY I UKŁAD --- */
-* {
-  box-sizing: border-box; /* Ważne, żeby ramki nie psuły szerokości! */
-}
-
-body {
-  margin: 0;
-  padding: 0;
-}
+<style scoped>
+/* --- TYLKO UKŁAD I WYMIARY --- */
 
 .app-wrapper {
   width: 100vw;
@@ -87,9 +57,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--bg-app);
-  color: var(--text-light);
-  font-family: sans-serif;
 }
 
 /* Główny kontener - 0px, pełna elastyczność */
@@ -99,14 +66,17 @@ body {
   aspect-ratio: 4 / 3;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-machine);
+  background-image: url('/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   font-size: 1em; 
   border: 1px solid #555; /* Ramka zewnętrzna 1px */
 }
 
 /* --- SEKCJE GŁÓWNE --- */
 .top-section { height: 85%; display: flex; }
-.bottom-section { height: 15%; display: flex; }
+.bottom-section { height: 15%; display: flex; background-color: transparent; }
 
 /* 1. LEWA GÓRA */
 .game-section { 
@@ -129,7 +99,6 @@ body {
 /* 3. LEWY DÓŁ */
 .bottom-left {
   width: 85%;
-  background-color: var(--bg-panel);
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -139,22 +108,16 @@ body {
 /* 4. PRAWY DÓŁ */
 .bottom-right {
   width: 15%;
-  background-color: var(--bg-machine);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* --- PRZYCISK SPIN (Tymczasowy styl) --- */
+/* --- SPECYFICZNE WYMIARY SPIN --- */
 .spin-btn {
-  width: 70%;
+  width: 65%;
   aspect-ratio: 1 / 1;
-  font-size: 1.1em;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 50%;
-  background-color: var(--bg-panel);
-  color: var(--gold-main);
-  border: 1px solid var(--gold-main);
+  border-radius: 50%; 
+  font-size: 1.6em; 
 }
 </style>

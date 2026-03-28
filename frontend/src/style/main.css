@@ -1,0 +1,66 @@
+/* src/style/main.css */
+
+:root {
+  /* --- TŁA GŁÓWNE --- */
+  --bg-app: #000000;                 /* Tło całej strony za maszyną */
+  --bg-machine: #eeeeee00;           /* Przezroczyste tło obudowy maszyny */
+  --bg-panel: #b1b1b100;             /* Przezroczyste tło paneli ze statystykami */
+
+  /* --- ZŁOTA PALETA LUXURY (Diablo Style) --- */
+  --btn-gold-bg: #8a6e48;            /* Główny kolor przycisków SPIN/BET */
+  --btn-gold-hover: #a68558;         /* Kolor przycisku po najechaniu myszką */
+  --btn-gold-border: #c5b081;        /* Kolor ramki przycisków */
+  --btn-gold-border-hover: #e6d5b0;  /* Kolor ramki po najechaniu myszką */
+  --btn-gold-shadow: #3d2f1b;        /* Cień 3D (bok wciskanego przycisku) */
+  --btn-gold-glow: rgba(197, 176, 129, 0.4); /* Złota poświata (efekt neonu) */
+  --btn-gold-text: #f3f2ec;          /* Kolor tekstu (kość słoniowa) */
+  --btn-gold-text-glow: rgba(243, 242, 236, 0.8); /* Blask tekstu */
+  
+  /* --- KOLORY TEKSTU --- */
+  --text-light: #eceae0;             /* Główny biały tekst (wartości) */
+  --text-muted: #837159;             /* Przygaszony złoty/brąz (etykiety STATS) */
+}
+
+/* --- RESETY I UKŁAD BAZOWY --- */
+* {
+  box-sizing: border-box;            /* Ramki i paddingi nie powiększają elementów */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-app);
+  color: var(--text-light);
+  font-family: sans-serif;
+  overflow: hidden;
+}
+
+/* --- BAZOWA KLASA PRZYCISKU 3D (Wspólna dla SPIN i BET) --- */
+.btn-gold-3d {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--btn-gold-bg);
+  color: var(--btn-gold-text);
+  font-weight: bold;
+  border: 0.2em solid var(--btn-gold-border);
+  cursor: pointer;
+  box-shadow: 0 0.15em 0 var(--btn-gold-shadow);
+  transition: all 0.1s ease-in-out;
+  outline: none;
+}
+
+.btn-gold-3d:hover {
+  background-color: var(--btn-gold-hover);
+  border-color: var(--btn-gold-border-hover);
+  color: var(--btn-gold-text-glow);
+  transform: scale(1.09);
+  box-shadow: 0 0.15em 0 var(--btn-gold-shadow), 0 0 0.8em var(--btn-gold-glow);
+  text-shadow: 0 0 0.5em var(--btn-gold-text-glow); /* Tworzy poświatę wokół liter */
+}
+
+.btn-gold-3d:active {
+  transition: all 0.05s ease-out;
+  transform: scale(1.03) translateY(0.15em);
+  box-shadow: 0 0 0 var(--btn-gold-shadow);
+}

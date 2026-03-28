@@ -12,8 +12,11 @@
       </div>
     </div>
 
-    <button class="bet-main-btn" @click="toggleBetMenu">
-      BET: {{ currentBet }}
+    <button 
+        :class="['btn-gold-3d', 'bet-main-btn', { 'is-open': isBetMenuOpen }]" 
+        @click="toggleBetMenu"
+    >
+        BET
     </button>
 
   </div>
@@ -49,47 +52,86 @@ const selectBet = (amount) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 40%; 
+  margin-bottom: 5%; 
 }
 
 .bet-dropdown {
   position: absolute;
-  bottom: 105%; 
+  bottom: 120%; 
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 0.4em;
-  width: 80%; 
+  width: 100%; 
   z-index: 10;
+  align-items: center;
 }
 
 .bet-option {
-  background-color: var(--bg-machine); /* Kolor z roota zamiast #333 */
-  border: 0.05em solid var(--gold-main);  /* Złoty z roota */
-  color: var(--text-light);
-  padding: 0.5em 0;
-  text-align: center;
-  cursor: pointer;
+  width: 25%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  /* Teraz też są złote od startu! */
+  background-color: var(--btn-gold-bg); 
+  color: white;
+  border: 0.15em solid var(--btn-gold-border);
+  font-size: 1.2em;
   font-weight: bold;
-  border-radius: 0.2em;
+  border-radius: 0.4em;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .bet-option:hover {
-  background-color: var(--bg-panel);
-  color: var(--gold-main);
+  background-color: var(--btn-gold-hover);
+  border-color: var(--btn-gold-border-hover);
+  box-shadow: 0 0 1.2em var(--btn-gold-glow); /* To jest to złote świecenie! */
+  transform: scale(1.15); /* Niech lekko wyskoczy do przodu */
 }
 
+/* GŁÓWNY PRZYCISK BET */
 .bet-main-btn {
-  width: 80%;
+  width: 50%;
   aspect-ratio: 2 / 1;
-  cursor: pointer;
-  font-size: 1.1em;
-  margin-bottom: 0; 
-  /* Tymczasowe kolory, dopóki nie zrobimy "złotych przycisków" z Twojego PR */
-  background-color: var(--bg-panel);
-  color: var(--gold-main);
-  border: 0.05em solid var(--gold-main);
-  border-radius: 0.2em;
+  border-radius: 0.4em;
+  font-size: 1em;
+  /* Wygląd, kolory, ramki, cienie i animacje lecą z .btn-gold-3d w main.css */
+}
+
+/* --- NADPISYWANIE GLOBALA DLA EFEKTU "SZTYWNEGO" KLIKNIĘCIA --- */
+
+.bet-main-btn:hover {
+  /* Blokujemy powiększanie (scale) z main.css */
+  transform: none; 
+}
+
+.bet-main-btn:active {
+  /* Tylko ruch w dół (translateY) - zasłania cień bez kurczenia się */
+  transform: translateY(0.15em); 
+}
+
+.bet-main-btn.is-open {
+  /* Przycisk zostaje na dole i "pożera" cień */
+  transform: translateY(0.15em); 
+  box-shadow: none;
+  
+  /* Resetujemy kolory do bazowych (wyłączamy świecenie) */
+  border-color: var(--btn-gold-border);
+  color: var(--btn-gold-text);
+  text-shadow: none;
+  cursor: default;
+}
+
+/* Blokujemy jakiekolwiek zmiany na hoverze, gdy menu jest otwarte */
+.bet-main-btn.is-open:hover {
+  background-color: var(--btn-gold-bg); /* Nie rozjaśnia się */
+  box-shadow: none;                    /* Nie dostaje glow wokół przycisku */
+  text-shadow: none;                   /* Nie dostaje glow na tekście */
+  border-color: var(--btn-gold-border);
+  transform: translateY(0.15em);       /* Zostaje w tej samej dolnej pozycji */
 }
 </style>
