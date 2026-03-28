@@ -110,7 +110,7 @@ onUnmounted(() => { window.removeEventListener('click', handleGlobalClick); });
 }
 
 .bet-main-btn {
-  width: 50%;
+  width: 40%;
   aspect-ratio: 2 / 1;
   border-radius: 0.4em;
   font-size: 1em;

@@ -18,7 +18,7 @@
   
   /* --- KOLORY TEKSTU --- */
   --text-light: #eceae0;             /* Główny biały tekst (wartości) */
-  --text-muted: #837159;             /* Przygaszony złoty/brąz (etykiety STATS) */
+  --text-muted: #9c876a;             /* Przygaszony złoty/brąz (etykiety STATS) */
 }
 
 /* --- RESETY I UKŁAD BAZOWY --- */
@@ -48,6 +48,7 @@ body {
   box-shadow: 0 0.15em 0 var(--btn-gold-shadow);
   transition: all 0.1s ease-in-out;
   outline: none;
+  text-shadow: 0 0 0.5em var(--btn-gold-text-glow); /* Tworzy poświatę wokół liter */
 }
 
 .btn-gold-3d:hover {

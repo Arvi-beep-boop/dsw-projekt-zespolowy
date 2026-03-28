@@ -61,9 +61,8 @@ const handleBetChange = (newAmount) => {
 
 /* Główny kontener - 0px, pełna elastyczność */
 .machine-container {
-  width: 80vw;
-  max-width: 60em;
-  aspect-ratio: 4 / 3;
+  height: 960px;
+  width: 1280px;
   display: flex;
   flex-direction: column;
   background-image: url('/background.jpg');
