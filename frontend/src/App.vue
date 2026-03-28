@@ -125,7 +125,7 @@ const handleBetChange = (newAmount) => {
 /* --- SPECYFICZNE WYMIARY SPIN --- */
 .spin-btn {
   position: relative;
-  width: 65%;
+  width: 75%;
   aspect-ratio: 1 / 1;
   border-radius: 50%; 
   font-size: 1.6em; 

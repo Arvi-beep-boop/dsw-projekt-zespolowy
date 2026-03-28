@@ -87,8 +87,8 @@ onUnmounted(() => { window.removeEventListener('click', handleGlobalClick); });
 }
 
 .bet-option {
-  width: 25%;
-  aspect-ratio: 1 / 1;
+  width: 50%;
+  aspect-ratio: 2 / 1;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -110,10 +110,10 @@ onUnmounted(() => { window.removeEventListener('click', handleGlobalClick); });
 }
 
 .bet-main-btn {
-  width: 40%;
+  width: 50%;
   aspect-ratio: 2 / 1;
   border-radius: 0.4em;
-  font-size: 1em;
+  font-size: 1.1em;
 }
 
 /* BLOKADA POWIĘKSZANIA (ZGODNIE Z TWOIM ŻYCZENIEM) */

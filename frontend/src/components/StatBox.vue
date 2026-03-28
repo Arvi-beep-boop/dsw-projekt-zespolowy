@@ -17,6 +17,7 @@ defineProps(['label', 'value', 'unit']);
   align-items: center;
   flex: 1; 
   gap: 0.4em;
+  transform: translateY(-0.8em);
 }
 
 .stat-label { 
