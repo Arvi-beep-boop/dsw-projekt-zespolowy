@@ -1,0 +1,106 @@
+[
+  {
+    "cumulativeWinMoney": 0,
+    "gameMode": "BASE_GAME",
+    "grid": [
+      [5, 7, 8],
+      [8, 4, 1],
+      [2, 8, 7]
+    ],
+    "numFreeSpinsAwarded": 5,
+    "numFreeSpinsPlayed": 0,
+    "totalNumberFreeSpins": 5,
+    "win": 0,
+    "winLineWinData": []
+  },
+  {
+    "cumulativeWinMoney": 100,
+    "gameMode": "FREE_GAME",
+    "grid": [
+      [2, 9, 7],
+      [9, 2, 9],
+      [5, 3, 9]
+    ],
+    "numFreeSpinsAwarded": 5,
+    "numFreeSpinsPlayed": 1,
+    "totalNumberFreeSpins": 5,
+    "win": 100,
+    "winLineWinData": [
+      {
+        "symbol": 2,
+        "length": 3,
+        "winLineId": 1,
+        "mult": 5
+      },
+      {
+        "symbol": 2,
+        "length": 3,
+        "winLineId": 3,
+        "mult": 5
+      }
+    ]
+  },
+  {
+    "cumulativeWinMoney": 100,
+    "gameMode": "FREE_GAME",
+    "grid": [
+      [1, 4, 3],
+      [9, 1, 2],
+      [5, 3, 6]
+    ],
+    "numFreeSpinsAwarded": 5,
+    "numFreeSpinsPlayed": 2,
+    "totalNumberFreeSpins": 5,
+    "win": 0,
+    "winLineWinData": []
+  },
+  {
+    "cumulativeWinMoney": 100,
+    "gameMode": "FREE_GAME",
+    "grid": [
+      [6, 5, 9],
+      [1, 4, 9],
+      [1, 2, 1]
+    ],
+    "numFreeSpinsAwarded": 5,
+    "numFreeSpinsPlayed": 3,
+    "totalNumberFreeSpins": 5,
+    "win": 0,
+    "winLineWinData": []
+  },
+  {
+    "cumulativeWinMoney": 100,
+    "gameMode": "FREE_GAME",
+    "grid": [
+      [1, 1, 2],
+      [3, 4, 9],
+      [2, 6, 2]
+    ],
+    "numFreeSpinsAwarded": 5,
+    "numFreeSpinsPlayed": 4,
+    "totalNumberFreeSpins": 5,
+    "win": 0,
+    "winLineWinData": []
+  },
+  {
+    "cumulativeWinMoney": 150,
+    "gameMode": "FREE_GAME",
+    "grid": [
+      [1, 4, 4],
+      [3, 2, 2],
+      [2, 9, 9]
+    ],
+    "numFreeSpinsAwarded": 5,
+    "numFreeSpinsPlayed": 5,
+    "totalNumberFreeSpins": 5,
+    "win": 50,
+    "winLineWinData": [
+      {
+        "symbol": 2,
+        "length": 3,
+        "winLineId": 2,
+        "mult": 5
+      }
+    ]
+  }
+]

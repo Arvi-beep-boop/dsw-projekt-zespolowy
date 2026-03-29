@@ -54,6 +54,15 @@ const handleBetChange = (newAmount) => {
 .app-wrapper {
   width: 100vw;
   height: 100vh;
+  margin: 0;
+  padding: 0;
+
+  background-image: url('background.jpg'); 
+  background-size: cover;
+  background-repeat: repeat; /* Powieli się, jeśli monitor jest za duży */
+  background-position: center;
+  background-color: #111; /* Kolor pod spodem na wszelki wypadek */
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -61,11 +70,13 @@ const handleBetChange = (newAmount) => {
 
 /* Główny kontener - 0px, pełna elastyczność */
 .machine-container {
-  height: 960px;
-  width: 1280px;
+  aspect-ratio: 4 / 3;
+  width: 98vw;
+  max-width: calc(98vh * (4 / 3));
+  max-height: 98vh;
+
   display: flex;
   flex-direction: column;
-  background-image: url('/background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

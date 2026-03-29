@@ -1,0 +1,29 @@
+[
+  {
+    "cumulativeWinMoney": 30,
+    "gameMode": "BASE_GAME",
+    "grid": [
+      [5, 9, 9],
+      [7, 7, 7],
+      [1, 5, 6]
+    ],
+    "numFreeSpinsAwarded": 0,
+    "numFreeSpinsPlayed": 0,
+    "totalNumberFreeSpins": 0,
+    "win": 30,
+    "winLineWinData": [
+      {
+        "symbol": 5,
+        "length": 3,
+        "winLineId": 0,
+        "mult": 2
+      },
+      {
+        "symbol": 7,
+        "length": 3,
+        "winLineId": 1,
+        "mult": 1
+      }
+    ]
+  }
+]
