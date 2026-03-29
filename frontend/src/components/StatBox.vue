@@ -25,6 +25,7 @@ defineProps(['label', 'value', 'unit']);
   flex: 1; 
   height: 100%; /* Wymusza wypełnienie całej wysokości z App.vue */
   min-height: 0;
+  
 }
 
 /* --- WIERSZE W KONTENERZE --- */
@@ -40,12 +41,13 @@ defineProps(['label', 'value', 'unit']);
 
 /* --- TEKST (LABEL) --- */
 .stat-label { 
-  font-size: 1.5em; 
+  font-family: "sierraMadre";
+  font-size: 2.5em; 
   color: var(--text-muted); /* Zmienna z main.css */
   text-transform: uppercase; 
   font-weight: bold;
   letter-spacing: 0.05em;
-  margin: 0;
+  margin-bottom: 0.7em;
 }
 
 /* --- RAMKA Z WARTOŚCIĄ --- */

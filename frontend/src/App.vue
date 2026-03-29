@@ -15,11 +15,22 @@ const globalPadding = 20;
 const handleBetChange = (newAmount) => {
   currentBet.value = newAmount;
 };
+
+const audio = new Audio('/assets/audio/logoSound.mp3');
+audio.volume = 0.8;
+
+const playLogoSound = () => {
+  if (!audio.paused) return; //
+  audio.currentTime = 0;
+  audio.play();
+};
+  
+
 </script>
 
 <template>
   <div class="app-wrapper">
-    <img src="/logo.png" class="game-logo" alt="Sztosy Waifu Slots">
+    <img src="/logo.png" class="game-logo" alt="Sztosy Waifu Slots" @click="playLogoSound">
     <div class="machine-container">
       
       <div class="top-section">
@@ -147,7 +158,8 @@ const handleBetChange = (newAmount) => {
   height: 100%; 
   aspect-ratio: 1 / 1; 
   border-radius: 50%;
-  font-size: 1.6em;
+  font-size: 2.5em;
+  font-family: "sierraMadre";
   z-index: 100;
   flex-shrink: 0; 
 }
@@ -164,6 +176,17 @@ const handleBetChange = (newAmount) => {
   opacity: 0.9; 
   /* Złożony filtr: tło + podwójne złote podświetlenie */
   filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 1.5em var(--btn-gold-glow)) drop-shadow(0 0 1.5em var(--btn-gold-glow));
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+
+.game-logo:hover {
+  transform: scale(1.09);
+}
+.game-logo:active {
+  transition: all 0.05s ease-out;
+  transform: scale(1.03); /* Przesunięcie o wysokość cienia */
 }
 
 /* Ukrycie loga przed kolizją z lewą krawędzią gry */
