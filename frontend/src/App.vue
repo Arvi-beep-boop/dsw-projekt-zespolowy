@@ -8,28 +8,29 @@ import GameDisplay from './components/GameDisplay.vue';
 const balance = ref(1000);
 const win = ref(0);
 const currentBet = ref(1);
-const availableBets = [1, 2, 3, 4];
+const availableBets = ref([1, 2, 3, 4]); // Dodałem ref(), żeby było reaktywne
 
 // Handler: Aktualizacja stawki z BetMenu
 const handleBetChange = (newAmount) => {
+  console.log("Zmieniam bet na:", newAmount); // Dodaj to dla testu w konsoli
   currentBet.value = newAmount;
 };
 
+// Obsługa dźwięku loga
 const audio = new Audio('/assets/audio/logoSound.mp3');
 audio.volume = 0.8;
 
 const playLogoSound = () => {
-  if (!audio.paused) return; //
+  if (!audio.paused) return;
   audio.currentTime = 0;
   audio.play();
 };
-  
-
 </script>
 
 <template>
   <div class="app-wrapper">
     <img src="/logo.png" class="game-logo" alt="Sztosy Waifu Slots" @click="playLogoSound">
+    
     <div class="machine-container">
       
       <div class="top-section">
@@ -49,9 +50,9 @@ const playLogoSound = () => {
         <div class="panel-right">
           <div class="bet-container">
             <BetMenu 
-              :currentBet="currentBet" 
-              :availableBets="availableBets"
-              @updateBet="handleBetChange" 
+              :current-bet="currentBet" 
+              :available-bets="availableBets"
+              @update-bet="handleBetChange" 
             />
           </div>
           <button class="btn-gold-3d spin-btn">SPIN</button>

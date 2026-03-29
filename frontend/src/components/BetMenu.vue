@@ -1,8 +1,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 
-const props = defineProps(['currentBet', 'availableBets']);
-const emit = defineEmits(['updateBet']);
+defineProps({
+  currentBet: Number,
+  availableBets: Array
+});
+
+const emit = defineEmits(['update-bet']);
 
 const isBetMenuOpen = ref(false);
 const betWrapper = ref(null);
@@ -12,7 +16,7 @@ const toggleBetMenu = () => {
 };
 
 const selectBet = (amount) => {
-  emit('updateBet', amount);
+  emit('update-bet', amount);
   isBetMenuOpen.value = false;
 };
 
