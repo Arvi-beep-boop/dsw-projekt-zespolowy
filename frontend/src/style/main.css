@@ -43,6 +43,7 @@
   /* Zmienne tekstowe - Typografia UI */
   --text-light: #eceae0;    /* Kolor dla wartości liczbowych */
   --text-muted: #9c876a;    /* Kolor dla etykiet (labeli) */
+  --font-primary: 'SierraMadre', sans-serif;
 
   /* Ustawienia efektów glow */
   --glow-frame: 0 0 1.2em 0.5em var(--btn-gold-glow);

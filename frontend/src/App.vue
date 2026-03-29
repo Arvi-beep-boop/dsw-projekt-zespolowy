@@ -159,7 +159,7 @@ const playLogoSound = () => {
   aspect-ratio: 1 / 1; 
   border-radius: 50%;
   font-size: 2.5em;
-  font-family: "sierraMadre";
+  font-family: var(--font-primary);
   z-index: 100;
   flex-shrink: 0; 
 }

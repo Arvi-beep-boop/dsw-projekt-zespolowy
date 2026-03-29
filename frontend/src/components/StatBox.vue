@@ -41,7 +41,7 @@ defineProps(['label', 'value', 'unit']);
 
 /* --- TEKST (LABEL) --- */
 .stat-label { 
-  font-family: "sierraMadre";
+  font-family: var(--font-primary);
   font-size: 2.5em; 
   color: var(--text-muted); /* Zmienna z main.css */
   text-transform: uppercase; 
