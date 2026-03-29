@@ -9,7 +9,6 @@ const balance = ref(1000);
 const win = ref(0);
 const currentBet = ref(1);
 const availableBets = [1, 2, 3, 4];
-const globalPadding = 20;
 
 // Handler: Aktualizacja stawki z BetMenu
 const handleBetChange = (newAmount) => {
