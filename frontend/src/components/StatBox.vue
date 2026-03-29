@@ -1,60 +1,73 @@
 <template>
   <div class="stat-box">
-    <div class="stat-label">{{ label }}</div>
-    <div class="value-frame">{{ value }} {{ unit }}</div>
+    <div class="stat-row">
+      <div class="stat-label">{{ label }}</div>
+    </div>
+    
+    <div class="stat-row">
+      <div class="value-frame">{{ value }} {{ unit }}</div>
+    </div>
+    
+    <div class="stat-row"></div>
   </div>
 </template>
 
 <script setup>
-/* Komentarz: Odbieramy propsy, żeby wyświetlić odpowiednie statystyki */
+// Odbiór danych do wyświetlenia w panelu UI
 defineProps(['label', 'value', 'unit']);
 </script>
 
 <style scoped>
+/* --- KONTENER GŁÓWNY --- */
 .stat-box {
   display: flex;
   flex-direction: column;
-  align-items: center;
   flex: 1; 
-  gap: 0.4em;
-  transform: translateY(-0.8em);
+  height: 100%; /* Wymusza wypełnienie całej wysokości z App.vue */
+  min-height: 0;
 }
 
+/* --- WIERSZE W KONTENERZE --- */
+/* Dzieli komponent na 3 równe piętra (każde zajmuje 1/3 wysokości) */
+.stat-row {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+}
+
+/* --- TEKST (LABEL) --- */
 .stat-label { 
   font-size: 1.5em; 
-  /* Ciągnie szary z roota w main.css */
-  color: var(--text-muted); 
+  color: var(--text-muted); /* Zmienna z main.css */
   text-transform: uppercase; 
   font-weight: bold;
   letter-spacing: 0.05em;
-  
+  margin: 0;
 }
 
+/* --- RAMKA Z WARTOŚCIĄ --- */
 .value-frame {
-  width: 90%;
-  
-  /* --- ZMIANA WYSOKOŚCI --- */
-  /* Zmienione z 4/1. Jeśli chcesz jeszcze niższe, wpisz np. 6/1 */
-  aspect-ratio: 5.5 / 1; 
+  width: 100%;
+  height: 100%; /* Wypełnia całą dostępną 1/3 wysokości (równo z przyciskiem BET) */
+  box-sizing: border-box; /* Zapobiega rozpychaniu wymiarów przez grubość ramki (border) */
   
   display: flex;
   justify-content: center;
   align-items: center;
+  
   font-size: 1.8em;
   font-weight: bold;
-  
   background-color: rgba(15, 15, 15, 0.85); 
-  
-  /* --- ZMIANA GRUBOŚCI RAMKI --- */
-  /* Pogrubione z 0.15em na 0.25em */
   border: 0.15em solid var(--btn-gold-border); 
-  
   border-radius: 0.8em; 
   color: var(--text-light); 
   
   box-shadow: 
     inset 0 0 0.8em rgba(0, 0, 0, 0.9), 
     0 0.3em 0.5em rgba(0, 0, 0, 0.4);
-  text-shadow: 0 0 0.5em var(--btn-gold-text-glow); /* Tworzy poświatę wokół liter */
+  text-shadow: 0 0 0.5em var(--btn-gold-text-glow);
 }
 </style>

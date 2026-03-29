@@ -16,15 +16,15 @@ const selectBet = (amount) => {
   isBetMenuOpen.value = false;
 };
 
-// NOWA FUNKCJA - Ignoruje ucieczkę na SPIN, ale zamyka na wszystko inne
+// Zapobiega zamknięciu menu przy szybkim zjechaniu kursorem w stronę przycisku SPIN
 const handleMouseLeave = (event) => {
   if (event.relatedTarget && event.relatedTarget.closest('.spin-btn')) {
-    return; // Zostawiamy menu otwarte
+    return;
   }
   isBetMenuOpen.value = false;
 };
 
-// Zamykanie kliknięciem (np. jak klikniesz w SPIN)
+// Globalne nasłuchiwanie: zamyka menu kliknięciem w dowolne inne miejsce na ekranie
 const handleGlobalClick = (event) => {
   if (isBetMenuOpen.value) {
     if (!event.target.closest('.bet-option') && !event.target.closest('.bet-main-btn')) {
@@ -62,26 +62,27 @@ onUnmounted(() => { window.removeEventListener('click', handleGlobalClick); });
 </template>
 
 <style scoped>
-/* PRZYWRÓCONE TWOJE ORYGINALNE STYLE */
+/* --- KONTENER GŁÓWNY --- */
 .bet-wrapper {
   position: relative; 
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 5%; 
+  justify-content: center; /* Wypełnia szerokość narzuconą przez App.vue */
   z-index: 50;
 }
 
+/* --- LISTA ZAKŁADÓW --- */
 .bet-dropdown {
   position: absolute;
-  bottom: 120%; 
+  bottom: 110%; 
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column-reverse;
   gap: 0.4em;
-  width: 100%; 
+  width: 200%; 
   z-index: 10;
   align-items: center;
 }
@@ -105,18 +106,22 @@ onUnmounted(() => { window.removeEventListener('click', handleGlobalClick); });
 .bet-option:hover {
   background-color: var(--btn-gold-hover);
   border-color: var(--btn-gold-border-hover);
-  box-shadow: 0 0 1.2em var(--btn-gold-glow);
   transform: scale(1.15);
+  box-shadow: 0 0.15em 0 var(--btn-gold-shadow), var(--glow-frame);
+  text-shadow: var(--glow-text);
 }
 
+/* --- GŁÓWNY PRZYCISK BET --- */
 .bet-main-btn {
-  width: 50%;
-  aspect-ratio: 2 / 1;
+  width: 100%;
+  height: 100%;
   border-radius: 0.4em;
   font-size: 1.1em;
+  margin: 0;
+  padding: 0;
 }
 
-/* BLOKADA POWIĘKSZANIA (ZGODNIE Z TWOIM ŻYCZENIEM) */
+/* Zachowanie przycisku (zablokowane skalowanie na hover) */
 .bet-main-btn:hover {
   transform: none; 
 }
@@ -142,19 +147,23 @@ onUnmounted(() => { window.removeEventListener('click', handleGlobalClick); });
   transform: translateY(0.15em);
 }
 
-/* TWOJA RAMKA HITBOX */
+/* --- ROZSZERZONY HITBOX (UX) --- 
+   Niewidoczna warstwa zapobiegająca przypadkowemu zamknięciu menu
+   przy gwałtownych ruchach myszką (np. zsuwając z opcji na główny widok Phasera) */
 .bet-wrapper::before {
   content: '';
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 24em; 
-  height: 24em;
+  width: 26em; 
+  height: 26em;
   z-index: -1; 
   display: none;
   pointer-events: all; 
-  /* Debug: background: rgba(0, 255, 0, 0.1); */
+  /* Pole ucieczki do wyswietlenia
+  background-color: rgba(255, 0, 0, 0.4);
+  */
 }
 
 .bet-wrapper.is-open::before {

@@ -3,13 +3,13 @@ import { ref } from 'vue';
 import StatBox from './components/StatBox.vue';
 import BetMenu from './components/BetMenu.vue';
 
-// Stan gry
+// Globalny stan maszyny
 const balance = ref(1000);
 const win = ref(0);
 const currentBet = ref(1);
 const availableBets = [1, 2, 3];
 
-// Obsługa zmiany zakładu z komponentu BetMenu
+// Aktualizacja stawki z komponentu BetMenu
 const handleBetChange = (newAmount) => {
   currentBet.value = newAmount;
 };
@@ -22,26 +22,27 @@ const handleBetChange = (newAmount) => {
       <div class="top-section">
         <div class="game-section">
           </div>
-        
-        <div class="spin-section">
-          <BetMenu 
-            :currentBet="currentBet" 
-            :availableBets="availableBets"
-            @updateBet="handleBetChange" 
-          />
-        </div>
       </div>
 
       <div class="bottom-section">
-        <div class="bottom-left">
+        
+        <div class="panel-left">
           <StatBox label="BALANCE" :value="balance" unit="€" />
           <StatBox label="WIN" :value="win" unit="€" />
           <StatBox label="BET" :value="currentBet" unit="€" />
         </div>
 
-        <div class="bottom-right">
+        <div class="panel-right">
+          <div class="bet-container">
+            <BetMenu 
+              :currentBet="currentBet" 
+              :availableBets="availableBets"
+              @updateBet="handleBetChange" 
+            />
+          </div>
           <button class="btn-gold-3d spin-btn">SPIN</button>
         </div>
+        
       </div>
 
     </div>
@@ -49,97 +50,102 @@ const handleBetChange = (newAmount) => {
 </template>
 
 <style scoped>
-/* --- TYLKO UKŁAD I WYMIARY --- */
-
+/* --- GŁÓWNY KONTENER APLIKACJI --- */
 .app-wrapper {
   width: 100vw;
   height: 100vh;
   margin: 0;
   padding: 0;
-
   background-image: url('background.jpg'); 
   background-size: cover;
-  background-repeat: repeat; /* Powieli się, jeśli monitor jest za duży */
+  background-repeat: no-repeat;
   background-position: center;
-  background-color: #111; /* Kolor pod spodem na wszelki wypadek */
-
+  background-color: #111;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Główny kontener - 0px, pełna elastyczność */
+/* Wymiary proporcjonalne automatu (4:3) */
 .machine-container {
   aspect-ratio: 4 / 3;
   width: 98vw;
   max-width: calc(98vh * (4 / 3));
   max-height: 98vh;
-
   display: flex;
   flex-direction: column;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  font-size: 1em; 
-  border: 1px solid #555; /* Ramka zewnętrzna 1px */
+  font-size: min(1.1vw, 1.8vh);  
 }
 
-/* --- SEKCJE GŁÓWNE --- */
+/* --- SEKCJA GRY (Phaser) --- */
 .top-section { 
   height: 85%; 
+  width: 100%;
   display: flex; 
 }
 
+.game-section { 
+  width: 100%; 
+  height: 100%;
+}
+
+/* --- SEKCJA INTERFEJSU (UI) --- */
 .bottom-section { 
   height: 15%; 
+  width: 100%;
   display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  gap: 20px; 
+  padding: 0; 
   background-color: transparent; 
   position: relative;
+  z-index: 10;
 }
 
-/* 1. LEWA GÓRA */
-.game-section { 
-  width: 85%; 
-  border-right: 1px solid #555; 
-  border-bottom: 1px solid #555; 
-}
-
-/* 2. PRAWA GÓRA */
-.spin-section {
-  width: 15%;
+/* --- LEWY PANEL (Statystyki) --- */
+.panel-left {
+  flex: 1; /* Automatyczne wypełnienie dostępnej przestrzeni */
+  display: flex;
+  justify-content: space-between; 
+  align-items: stretch; /* StatBoxy zajmują 100% wysokości panelu */
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  border-bottom: 1px solid #555; 
-  position: relative;
+  gap: 20px; 
 }
 
-/* 3. LEWY DÓŁ */
-.bottom-left {
-  width: 85%;
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  border-right: 1px solid #555; 
+.panel-left > * {
+  flex: 1; 
+  margin: 0 !important; 
 }
 
-/* 4. PRAWY DÓŁ */
-.bottom-right {
-  width: 15%;
+/* --- PRAWY PANEL (Akcje) --- */
+.panel-right {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  height: 100%;
+  gap: 20px; 
+}
+
+/* Kontener dla przycisku stawki (proporcja 2:1, 1/3 wysokości) */
+.bet-container {
+  height: 33.33%; 
+  aspect-ratio: 2 / 1; 
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* --- SPECYFICZNE WYMIARY SPIN --- */
+/* Główny przycisk obrotu (proporcja 1:1, pełna wysokość) */
 .spin-btn {
-  position: relative;
-  width: 75%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%; 
-  font-size: 1.6em; 
+  height: 100%; 
+  aspect-ratio: 1 / 1; 
+  border-radius: 50%;
+  font-size: 1.6em;
   z-index: 100;
+  flex-shrink: 0; 
 }
 </style>
