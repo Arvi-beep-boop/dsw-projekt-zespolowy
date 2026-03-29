@@ -69,5 +69,6 @@ defineProps(['label', 'value', 'unit']);
     inset 0 0 0.8em rgba(0, 0, 0, 0.9), 
     0 0.3em 0.5em rgba(0, 0, 0, 0.4);
   text-shadow: 0 0 0.5em var(--btn-gold-text-glow);
+  
 }
 </style>

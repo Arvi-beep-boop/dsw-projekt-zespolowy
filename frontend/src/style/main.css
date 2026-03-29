@@ -1,6 +1,16 @@
 /* src/style/main.css */
 
 :root {
+  /* Zmienne układu i odstępów dla całej aplikacji */
+  --app-padding: 20px;
+  --logo-collision-gap: 20px;
+  --logo-max-width: 250px;
+
+  /* Globalna matematyka dostępnej przestrzeni */
+  --available-width: calc(100vw - (var(--app-padding) * 2));
+  --available-height: calc(100vh - (var(--app-padding) * 2));
+  --game-width: min(var(--available-width), calc(var(--available-height) * (4 / 3)));
+
   /* Zmienne globalne - Kolory tła */
   --bg-app: #000000;
   --bg-machine: transparent;
@@ -37,9 +47,11 @@ body {
   color: var(--text-light);
   font-family: sans-serif;
   overflow: hidden; /* Blokada przewijania dla pełnego ekranu */
+  width: 100vw;
+  height: 100vh;
 }
 
-/* Klasa bazowa: Przycisk 3D */
+/* Klasa bazowa: Przycisk 3D (Wielokrotnego użytku) */
 .btn-gold-3d {
   display: flex;
   justify-content: center;

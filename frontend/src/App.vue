@@ -2,14 +2,16 @@
 import { ref } from 'vue';
 import StatBox from './components/StatBox.vue';
 import BetMenu from './components/BetMenu.vue';
+import GameDisplay from './components/GameDisplay.vue';
 
-// Globalny stan maszyny
+// Stan globalny UI maszyny
 const balance = ref(1000);
 const win = ref(0);
 const currentBet = ref(1);
-const availableBets = [1, 2, 3];
+const availableBets = [1, 2, 3, 4];
+const globalPadding = 20;
 
-// Aktualizacja stawki z komponentu BetMenu
+// Handler: Aktualizacja stawki z BetMenu
 const handleBetChange = (newAmount) => {
   currentBet.value = newAmount;
 };
@@ -17,11 +19,13 @@ const handleBetChange = (newAmount) => {
 
 <template>
   <div class="app-wrapper">
+    <img src="/logo.png" class="game-logo" alt="Sztosy Waifu Slots">
     <div class="machine-container">
       
       <div class="top-section">
         <div class="game-section">
-          </div>
+          <GameDisplay />
+        </div>
       </div>
 
       <div class="bottom-section">
@@ -50,37 +54,38 @@ const handleBetChange = (newAmount) => {
 </template>
 
 <style scoped>
-/* --- GŁÓWNY KONTENER APLIKACJI --- */
+/* --- KONTENER GŁÓWNY (Tło i centrowanie) --- */
 .app-wrapper {
+  position: relative;
   width: 100vw;
   height: 100vh;
-  margin: 0;
-  padding: 0;
+  padding: var(--app-padding);
   background-image: url('background.jpg'); 
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  background-color: #111;
+  background-color: var(--bg-app);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Wymiary proporcjonalne automatu (4:3) */
+/* --- SZKIELET MASZYNY (Wymuszony rzut 4:3) --- */
 .machine-container {
   aspect-ratio: 4 / 3;
-  width: 98vw;
-  max-width: calc(98vh * (4 / 3));
-  max-height: 98vh;
+  width: var(--available-width);
+  max-height: var(--available-height);
+  max-width: calc(var(--available-height) * (4 / 3));
   display: flex;
   flex-direction: column;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  font-size: min(1.1vw, 1.8vh);  
+  font-size: min(1.1vw, 1.8vh);
+  position: relative;
 }
 
-/* --- SEKCJA GRY (Phaser) --- */
+/* --- SEKCJA GRY (Obszar pod płótno Phasera) --- */
 .top-section { 
   height: 85%; 
   width: 100%;
@@ -92,7 +97,7 @@ const handleBetChange = (newAmount) => {
   height: 100%;
 }
 
-/* --- SEKCJA INTERFEJSU (UI) --- */
+/* --- SEKCJA UI (Pasek dolny interfejsu) --- */
 .bottom-section { 
   height: 15%; 
   width: 100%;
@@ -101,17 +106,17 @@ const handleBetChange = (newAmount) => {
   align-items: center;
   gap: 20px; 
   padding: 0; 
-  background-color: transparent; 
+  background-color: var(--bg-panel); 
   position: relative;
   z-index: 10;
 }
 
-/* --- LEWY PANEL (Statystyki) --- */
+/* --- LEWY PANEL (Statystyki Gracza) --- */
 .panel-left {
-  flex: 1; /* Automatyczne wypełnienie dostępnej przestrzeni */
+  flex: 1; 
   display: flex;
   justify-content: space-between; 
-  align-items: stretch; /* StatBoxy zajmują 100% wysokości panelu */
+  align-items: stretch; 
   height: 100%;
   gap: 20px; 
 }
@@ -121,7 +126,7 @@ const handleBetChange = (newAmount) => {
   margin: 0 !important; 
 }
 
-/* --- PRAWY PANEL (Akcje) --- */
+/* --- PRAWY PANEL (Akcje i Stawki) --- */
 .panel-right {
   display: flex;
   justify-content: space-between; 
@@ -130,7 +135,6 @@ const handleBetChange = (newAmount) => {
   gap: 20px; 
 }
 
-/* Kontener dla przycisku stawki (proporcja 2:1, 1/3 wysokości) */
 .bet-container {
   height: 33.33%; 
   aspect-ratio: 2 / 1; 
@@ -139,7 +143,6 @@ const handleBetChange = (newAmount) => {
   align-items: center;
 }
 
-/* Główny przycisk obrotu (proporcja 1:1, pełna wysokość) */
 .spin-btn {
   height: 100%; 
   aspect-ratio: 1 / 1; 
@@ -147,5 +150,26 @@ const handleBetChange = (newAmount) => {
   font-size: 1.6em;
   z-index: 100;
   flex-shrink: 0; 
+}
+
+/* --- LOGO GRY (Pływające nad layoutem) --- */
+.game-logo {
+  position: absolute;
+  top: var(--app-padding);
+  left: var(--app-padding);
+  width: 22.5vh; 
+  max-width: var(--logo-max-width); 
+  z-index: 100;
+  pointer-events: none; 
+  opacity: 0.9; 
+  /* Złożony filtr: tło + podwójne złote podświetlenie */
+  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 1.5em var(--btn-gold-glow)) drop-shadow(0 0 1.5em var(--btn-gold-glow));
+}
+
+/* Ukrycie loga przed kolizją z lewą krawędzią gry */
+@media (max-aspect-ratio: 18/10) {
+  .game-logo {
+    display: none;
+  }
 }
 </style>

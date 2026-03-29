@@ -101,6 +101,7 @@ onUnmounted(() => { window.removeEventListener('click', handleGlobalClick); });
   border-radius: 0.4em;
   cursor: pointer;
   transition: all 0.2s ease;
+  
 }
 
 .bet-option:hover {
@@ -119,6 +120,7 @@ onUnmounted(() => { window.removeEventListener('click', handleGlobalClick); });
   font-size: 1.1em;
   margin: 0;
   padding: 0;
+  
 }
 
 /* Zachowanie przycisku (zablokowane skalowanie na hover) */
