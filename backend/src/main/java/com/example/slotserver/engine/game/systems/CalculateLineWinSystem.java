@@ -14,8 +14,7 @@ public final class CalculateLineWinSystem {
         gameState.winLineWinData = winLineCalculator.calculateLineWins(gameState.grid);
 
         final var multi = gameState.winLineWinData.stream().mapToInt(WinLineData::getMult).sum();
-        // todo: replace default bet with the value received from the client.
-        final var winMoney = Math.multiplyExact(multi, GameConstants.DEFAULT_BET);
+        final var winMoney = Math.multiplyExact(multi, gameState.bet);
 
         gameState.stepWinMoney = winMoney;
         gameState.cumulativeWinMoney = Math.addExact(gameState.cumulativeWinMoney, winMoney);
