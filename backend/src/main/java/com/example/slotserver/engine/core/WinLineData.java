@@ -13,9 +13,20 @@ public class WinLineData {
         this.mult = mult;
     }
 
-    public int getSymbol() { return symbol; }
-    public int getLength() { return length; }
-    public int getWinLineId() { return winLineId; }
-    public int getMult() { return mult; }
+    public int getSymbol() {
+        return symbol;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public int getWinLineId() {
+        return winLineId;
+    }
+
+    public int getMult() {
+        return mult;
+    }
 }
 

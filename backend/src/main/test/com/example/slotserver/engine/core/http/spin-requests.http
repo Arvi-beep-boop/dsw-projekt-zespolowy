@@ -1,0 +1,19 @@
+### Test a valid spin
+POST http://localhost:8080/api/v1/spin
+Content-Type: application/json
+
+{
+  "bet": 10
+}
+
+### Test an invalid (too low) bet
+POST http://localhost:8080/api/v1/spin
+Content-Type: application/json
+
+{
+  "bet": -1
+}
+
+### Get Initial Game State (Balance and Last Spin)
+GET http://localhost:8080/api/v1/init
+Accept: application/json

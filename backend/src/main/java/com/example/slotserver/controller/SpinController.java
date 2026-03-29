@@ -1,17 +1,18 @@
 package com.example.slotserver.controller;
 
-import com.example.slotserver.Greeting;
+import com.example.slotserver.engine.core.GameMode;
+import com.example.slotserver.engine.core.Grid;
+import com.example.slotserver.model.SpinRequest;
+import com.example.slotserver.model.SpinResponse;
 import com.example.slotserver.model.SpinResult;
 import com.example.slotserver.service.SpinService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 
 @RestController
+@RequestMapping("/api/v1")
 public class SpinController {
 
     private final SpinService spinService;
@@ -20,8 +21,27 @@ public class SpinController {
         this.spinService = spinService;
     }
 
-    @GetMapping("/spin")
-    public List<SpinResult> spin() {
-        return spinService.spin();
+    @PostMapping("/spin")
+    public SpinResponse spin(@RequestBody SpinRequest spinRequest) {
+
+        return spinService.spin(spinRequest);
+    }
+
+    @GetMapping("/init")
+    public SpinResponse getInitialState() {
+        final var spinResult = new SpinResult();
+        spinResult.cumulativeWinMoney = 0;
+        spinResult.gameMode = GameMode.BASE_GAME;
+        spinResult.grid = new Grid(new int[][]{
+                {6, 5, 3},
+                {7, 8, 8},
+                {5, 9, 2}
+        });
+        spinResult.numFreeSpinsPlayed = 0;
+        spinResult.numFreeSpinsAwarded = 0;
+        spinResult.totalNumberFreeSpins = 0;
+        spinResult.win = 0;
+        spinResult.reelStops = new int[]{41, 2, 35};
+        return new SpinResponse(List.of(spinResult), spinService.getBalance());
     }
 }

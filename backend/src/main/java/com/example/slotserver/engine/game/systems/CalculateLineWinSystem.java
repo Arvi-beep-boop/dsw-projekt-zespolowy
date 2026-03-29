@@ -17,7 +17,7 @@ public final class CalculateLineWinSystem {
         // todo: replace default bet with the value received from the client.
         final var winMoney = Math.multiplyExact(multi, GameConstants.DEFAULT_BET);
 
-        gameState.stepWinMoney =  winMoney;
+        gameState.stepWinMoney = winMoney;
         gameState.cumulativeWinMoney = Math.addExact(gameState.cumulativeWinMoney, winMoney);
     }
 }

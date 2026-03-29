@@ -20,6 +20,7 @@ public class StepResultMapper {
 
     private static void mapCommon(final SpinResult data, final GameState gameState) {
         data.grid = new Grid(gameState.grid);
+        data.reelStops = gameState.reelStops;
         data.win = gameState.stepWinMoney;
         data.winLineWinData = List.copyOf(gameState.winLineWinData);
         data.cumulativeWinMoney = gameState.cumulativeWinMoney;
