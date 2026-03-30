@@ -32,10 +32,9 @@ const handleSpin = () => {
           <GameDisplay />
         </div>
       </div>
-      <! Wstrzykujemy bieżące wartości ze stanu UI (const balance, win itp.) do komponentu. 
+      <!--Wstrzykujemy bieżące wartości ze stanu UI (const balance, win itp.) do komponentu. 
         @update-bet: Wywołuje handleBetChange, gdy gracz zmieni stawkę w menu.
-        @spin: Wywołuje handleSpin, inicjując cykl losowania i komunikację z APIsss.
-      >
+        @spin: Wywołuje handleSpin, inicjując cykl losowania i komunikację z API. -->
       <ControlPanel 
         :balance="balance" 
         :win="win" 
