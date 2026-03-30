@@ -1,0 +1,104 @@
+/* SRC/STYLE/MAIN.CSS */
+
+@font-face {
+  font-family: 'SierraMadre';
+  src: url('../assets/fonts/SierraMadre-JVYM.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SierraMadre';
+  src: url('../assets/fonts/SierraMadreBold-GoRg.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+:root {
+  /* ZMIENNE UKŁADU I ODSTĘPÓW */
+  --app-padding: 20px;
+  --ui-gap: 20px;                         /* GŁÓWNY ODSTĘP ROZSUWAJĄCY PANELE I GUZIKI */
+  --logo-collision-gap: 20px;
+  --logo-max-width: 250px;
+
+  /* MATEMATYKA PROPORCJI 4:3 */
+  --available-width: calc(100vw - (var(--app-padding) * 2));
+  --available-height: calc(100vh - (var(--app-padding) * 2));
+  --game-width: min(var(--available-width), calc(var(--available-height) * (4 / 3)));
+
+  /* KOLORY TŁA */
+  --bg-app: #000000;
+  --bg-machine: transparent;
+  --bg-panel: transparent;
+
+  /* PALETA GOLD INTERACTIVE (GUZIKI) */
+  --btn-gold-bg: #8a6e48;                 /* GŁÓWNY BRĄZOWO-ZŁOTY KOLOR WYPEŁNIENIA */
+  --btn-gold-hover: #a68558;              /* JAŚNIEJSZY ODCIEŃ PRZY NAJECHANIU MYSZKĄ */
+  --btn-gold-border: #c5b081;             /* CIENKA OSTRA RAMKA WOKÓŁ PRZYCISKU */
+  --btn-gold-border-hover: #e6d5b0;       /* EFEKT PODŚWIETLENIA KRAWĘDZI */
+  --btn-gold-shadow: #3d2f1b;             /* CIEMNY PASEK NA DOLE TWORZĄCY GRUBOŚĆ 3D */
+  --btn-gold-glow: rgba(197, 176, 129, 0.4); /* POŚWIATA EMITOWANA PRZY INTERAKCJI */
+  
+  --btn-gold-text: #f3f2ec;               /* PODSTAWOWY KOLOR NAPISÓW */
+  --btn-gold-text-glow: rgba(243, 242, 236, 0.8); /* EFEKT JARZENIA SIĘ SAMEGO TEKSTU */
+  
+  /* TYPOGRAFIA I TEKSTY */
+  --text-light: #eceae0;                  /* JASNY KOLOR DLA CYFR I WARTOŚCI */
+  --text-muted: #9c876a;                  /* STONOWANY KOLOR DLA ETYKIET (LABELI) */
+  --font-primary: 'SierraMadre', sans-serif;
+
+  /* GOTOWE PACZKI ŚWIECENIA */
+  --glow-frame: 0 0 1.2em 0.5em var(--btn-gold-glow);
+  --glow-text: 0 0 0.6em var(--btn-gold-text-glow);
+}
+
+/* RESET I ZABEZPIECZENIE BOX-MODELU */
+* {
+  box-sizing: border-box;
+}
+
+/* BLOKADA PRZEWIJANIA I USTAWIENIA OKNA */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-app);
+  color: var(--text-light);
+  font-family: sans-serif;
+  overflow: hidden; 
+  width: 100vw;
+  height: 100vh;
+}
+
+/* SYSTEM PRZYCISKÓW: CENTROWANIE I GRUBOŚĆ 3D */
+.btn-gold-3d {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--btn-gold-bg);
+  color: var(--btn-gold-text);
+  font-weight: bold;
+  border: 0.2em solid var(--btn-gold-border);
+  cursor: pointer;
+  box-shadow: 0 0.15em 0 var(--btn-gold-shadow);
+  transition: all 0.1s ease-in-out;
+  outline: none;
+  text-shadow: 0 0 0.5em var(--btn-gold-text-glow);
+}
+
+/* REAKCJA HOVER: SKALOWANIE I EMISJA POŚWIATY */
+.btn-gold-3d:hover {
+  background-color: var(--btn-gold-hover);
+  border-color: var(--btn-gold-border-hover);
+  color: var(--btn-gold-text-glow);
+  transform: scale(1.09);
+  box-shadow: 0 0.15em 0 var(--btn-gold-shadow), var(--glow-frame);
+  text-shadow: var(--glow-text);
+}
+
+/* FIZYKA KLIKNIĘCIA: SYMULACJA WCISKANIA PLASTIKU */
+.btn-gold-3d:active {
+  transition: all 0.05s ease-out;
+  transform: scale(1.03) translateY(0.15em); 
+  box-shadow: 0 0.15em 0 var(--btn-gold-shadow), var(--glow-frame);
+  text-shadow: var(--glow-text);
+}
