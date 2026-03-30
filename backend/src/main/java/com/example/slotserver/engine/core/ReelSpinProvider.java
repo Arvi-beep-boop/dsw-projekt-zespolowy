@@ -21,12 +21,12 @@ public final class ReelSpinProvider {
     }
 
     public void setGridReelStops(final int[] reelStops, final Grid grid) {
-        for (int i = 0; i <  reelStops.length; i++) {
+        for (int i = 0; i < reelStops.length; i++) {
             final int stop = reelStops[i];
             final int[] idx = {
                     (stop - 1 + reelSet[i].length) % reelSet[i].length,
                     stop,
-                    (stop + 1) %  reelSet[i].length,
+                    (stop + 1) % reelSet[i].length,
             };
             for (int j = 0; j < idx.length; j++) {
                 int symbol = reelSet[i][idx[j]];

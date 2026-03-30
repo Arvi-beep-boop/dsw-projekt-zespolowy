@@ -5,5 +5,6 @@ import com.example.slotserver.model.SpinResult;
 
 public interface GameStep {
     void execute(GameState gameState);
+
     SpinResult mapStepData(GameState gameState);
 }

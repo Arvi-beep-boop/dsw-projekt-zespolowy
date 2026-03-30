@@ -30,8 +30,6 @@ public class FreeGameStep implements GameStep {
         reelSpinProvider.setGridReelStops(gameState.reelStops, gameState.grid);
 
         calculateLineWins(winLineCalculator, gameState);
-
-        gameState.winLineWinData = winLineCalculator.calculateLineWins(gameState.grid);
     }
 
     @Override

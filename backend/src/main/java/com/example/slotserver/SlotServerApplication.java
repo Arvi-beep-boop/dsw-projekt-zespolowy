@@ -9,5 +9,4 @@ class SlotServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(SlotServerApplication.class, args);
     }
-
 }

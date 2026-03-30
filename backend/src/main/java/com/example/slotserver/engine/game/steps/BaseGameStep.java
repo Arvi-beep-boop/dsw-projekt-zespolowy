@@ -30,8 +30,6 @@ public class BaseGameStep implements GameStep {
 
         calculateLineWins(winLineCalculator, gameState);
 
-        gameState.winLineWinData = winLineCalculator.calculateLineWins(gameState.grid);
-
         triggerFreeSpins(gameState);
     }
 

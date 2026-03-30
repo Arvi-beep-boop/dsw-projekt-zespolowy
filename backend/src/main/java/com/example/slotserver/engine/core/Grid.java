@@ -11,7 +11,7 @@ public final class Grid {
 
 
     public Grid(final int width, final int height) {
-        if(width <= 0 || height <= 0) {
+        if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Width and height must be positive");
         }
         this.width = width;
@@ -50,8 +50,8 @@ public final class Grid {
     }
 
     public void clear() {
-        for(int i = 0; i < width; i++) {
-            for(int j = 0; j < height; j++) {
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
                 this.grid[i][j] = 0;
             }
         }
@@ -59,9 +59,9 @@ public final class Grid {
 
     public int count(final int symbol) {
         int count = 0;
-        for(int i = 0; i < width; i++) {
-            for(int j = 0; j < height; j++) {
-                if(this.grid[i][j] == symbol) {
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (this.grid[i][j] == symbol) {
                     count++;
                 }
             }

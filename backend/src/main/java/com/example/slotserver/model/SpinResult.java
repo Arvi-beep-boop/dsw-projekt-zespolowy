@@ -10,6 +10,7 @@ public class SpinResult {
 
     public GameMode gameMode;
     public Grid grid;
+    public int[] reelStops;
     public long win;
     public List<WinLineData> winLineWinData;
 

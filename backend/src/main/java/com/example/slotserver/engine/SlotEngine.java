@@ -8,6 +8,7 @@ import com.example.slotserver.engine.game.constants.SymbolCodes;
 import com.example.slotserver.engine.game.params.ReelSet;
 import com.example.slotserver.engine.game.steps.BaseGameStep;
 import com.example.slotserver.engine.game.steps.FreeGameStep;
+import com.example.slotserver.model.SpinRequest;
 import com.example.slotserver.model.SpinResult;
 import org.springframework.stereotype.Component;
 
@@ -29,16 +30,16 @@ public class SlotEngine {
         freeGameStep = new FreeGameStep(new ReelSpinProvider(ReelSet.FREE_REEL_SET, ro), winLineCalculator, ro);
     }
 
-    public List<SpinResult> spin() {
+    public List<SpinResult> spin(final SpinRequest spinRequest) {
 
         final List<SpinResult> spinResults = new ArrayList<>();
 
-        final GameState gameState = new GameState();
+        final GameState gameState = new GameState(spinRequest.getBet());
 
         baseGameStep.execute(gameState);
         spinResults.add(baseGameStep.mapStepData(gameState));
 
-        while(gameState.numFreeSpinsPlayed < gameState.totalNumberFreeSpins) {
+        while (gameState.numFreeSpinsPlayed < gameState.totalNumberFreeSpins) {
             freeGameStep.execute(gameState);
             spinResults.add(freeGameStep.mapStepData(gameState));
         }
