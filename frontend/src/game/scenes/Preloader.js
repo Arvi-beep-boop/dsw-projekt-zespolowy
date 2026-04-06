@@ -1,14 +1,11 @@
 import { Scene } from 'phaser';
 
-export class Preloader extends Scene
-{
-    constructor ()
-    {
+export class Preloader extends Scene {
+    constructor() {
         super('Preloader');
     }
 
-    init ()
-    {
+    init() {
         //  We loaded this image in our Boot Scene, so we can display it here
         this.add.image(512, 384, 'background');
 
@@ -16,7 +13,7 @@ export class Preloader extends Scene
         this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
 
         //  This is the progress bar itself. It will increase in size from the left based on the % of progress.
-        const bar = this.add.rectangle(512-230, 384, 4, 28, 0xffffff);
+        const bar = this.add.rectangle(512 - 230, 384, 4, 28, 0xffffff);
 
         //  Use the 'progress' event emitted by the LoaderPlugin to update the loading bar
         this.load.on('progress', (progress) => {
@@ -27,8 +24,7 @@ export class Preloader extends Scene
         });
     }
 
-    preload ()
-    {
+    preload() {
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
@@ -36,12 +32,21 @@ export class Preloader extends Scene
         this.load.image('star', 'star.png');
     }
 
-    create ()
-    {
+    create() {
         //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
         //  For example, you can define global animations here, so we can use them in other scenes.
 
+        const colW = this.scale.width / 3;
+        const rowH = this.scale.height / 3;
+
+        const gfx = this.make.graphics();
+        gfx.fillStyle(0xff0000); gfx.fillRect(0, 0, colW, rowH); gfx.generateTexture('sym1', colW, rowH);
+        gfx.clear(); gfx.fillStyle(0x00ff00); gfx.fillRect(0, 0, colW, rowH); gfx.generateTexture('sym2', colW, rowH);
+        gfx.clear(); gfx.fillStyle(0x0000ff); gfx.fillRect(0, 0, colW, rowH); gfx.generateTexture('sym3', colW, rowH);
+        gfx.clear(); gfx.fillStyle(0xffff00); gfx.fillRect(0, 0, colW, rowH); gfx.generateTexture('sym4', colW, rowH);
+        gfx.destroy();
+
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start('MainMenu');
+        this.scene.start('Game');
     }
 }

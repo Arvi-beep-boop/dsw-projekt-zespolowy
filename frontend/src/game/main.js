@@ -7,9 +7,12 @@ import { Preloader } from './scenes/Preloader';
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
     type: Phaser.AUTO,
-    width: 1024,
-    height: 768,
-    parent: 'game-container',
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        parent: 'game-container',
+        width: '100%',
+        height: '100%'
+    },
     backgroundColor: '#028af8',
     scene: [
         Boot,
