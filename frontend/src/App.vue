@@ -15,9 +15,12 @@ const handleBetChange = (newAmount) => {
   currentBet.value = newAmount;
 };
 
+import { EventBus } from './game/EventBus';
+
 // HANDLER SPIN: Punkt startowy dla RNG i animacji bębnów.
 const handleSpin = () => {
-  console.log("Spinning..."); // Miejsce na logikę Phasera
+  console.log("Spinning...");
+  EventBus.emit('spin');
 };
 </script>
 

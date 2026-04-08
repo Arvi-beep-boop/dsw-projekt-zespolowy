@@ -37,3 +37,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Custom Local Tools ###
+apache-maven-*/
+jdk-install/
+out.txt

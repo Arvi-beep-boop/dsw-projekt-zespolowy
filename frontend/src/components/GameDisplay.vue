@@ -1,11 +1,11 @@
+<script setup>
+import PhaserGame from '../PhaserGame.vue';
+</script>
+
 <template>
   <div class="display-wrapper">
     <div class="reels-frame">
-      <div class="placeholder-grid">
-        <div v-for="i in 3" :key="i" class="reel-column">
-          <div v-for="j in 3" :key="j" class="symbol-slot"></div>
-        </div>
-      </div>
+      <PhaserGame />
     </div>
   </div>
 </template>
