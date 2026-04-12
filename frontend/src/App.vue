@@ -1,26 +1,57 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import GameLogo from './components/GameLogo.vue';
 import GameDisplay from './components/GameDisplay.vue';
 import ControlPanel from './components/ControlPanel.vue';
-
-// STAN UI: Wartości synchronizowane z interfejsem.
-const balance = ref(1000);
-const win = ref(0);
-const currentBet = ref(1);
-const availableBets = ref([1, 2, 3, 4]); 
-
-// AKTUALIZACJA STANU: Synchronizacja wartości z ControlPanel.
-const handleBetChange = (newAmount) => {
-  currentBet.value = newAmount;
-};
-
+import { fetchInitialState, spinReelsAPI } from './api/gameApi';
 import { EventBus } from './game/EventBus';
 
-// HANDLER SPIN: Punkt startowy dla RNG i animacji bębnów.
-const handleSpin = () => {
-  console.log("Spinning...");
-  EventBus.emit('spin');
+const SCALAR = 100;
+const balance = ref(0);
+const win = ref(0);
+const currentBet = ref(1);
+const availableBets = ref([1, 2, 3, 4]);
+
+const handleBetChange = (newAmount) => {
+    currentBet.value = newAmount;
+};
+
+onMounted(async () => {
+    const initState = await fetchInitialState();
+    if (initState) {
+        balance.value = initState.newBalance / SCALAR;
+    }
+});
+
+const handleSpin = async () => {
+    const backendBet = currentBet.value * SCALAR;
+
+    try {
+        const response = await spinReelsAPI(backendBet);
+
+        if (response && response.gameResult && response.gameResult.length > 0) {
+            balance.value = response.newBalance / SCALAR;
+            win.value = 0;
+            
+            for (let i = 0; i < response.gameResult.length; i++) {
+                const result = response.gameResult[i];
+                
+                if (i > 0) {
+                    EventBus.emit('spin-start');
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } else {
+                    EventBus.emit('spin-start');
+                }
+                
+                EventBus.emit('spin-stop', result.grid);
+                win.value = result.cumulativeWinMoney / SCALAR;
+                await new Promise(resolve => setTimeout(resolve, 2500));
+            }
+        }
+    } catch (error) {
+        console.error(error.message);
+        alert("Spin odrzucony: Sprawdź saldo lub stawkę.");
+    }
 };
 </script>
 
