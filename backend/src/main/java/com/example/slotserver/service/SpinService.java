@@ -28,6 +28,10 @@ public class SpinService {
         return new SpinResponse(spinResult, balance);
     }
 
+    public void resetBalance() {
+        this.balance = 10000;
+    }
+
     public long getBalance() {
         return this.balance;
     }

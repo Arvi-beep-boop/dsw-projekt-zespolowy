@@ -27,6 +27,11 @@ public class SpinController {
         return spinService.spin(spinRequest);
     }
 
+    @PostMapping("/reload")
+    public void reload() {
+        spinService.resetBalance();
+    }
+
     @GetMapping("/init")
     public SpinResponse getInitialState() {
         final var spinResult = new SpinResult();
