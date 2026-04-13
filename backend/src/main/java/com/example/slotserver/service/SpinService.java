@@ -14,7 +14,7 @@ import java.util.List;
 public class SpinService {
 
     private final SlotEngine slotEngine;
-    private long balance = 10000;
+    private long balance = 1_000_000;
 
     public SpinService(SlotEngine slotEngine) {
         this.slotEngine = slotEngine;
@@ -29,7 +29,7 @@ public class SpinService {
     }
 
     public void resetBalance() {
-        this.balance = 10000;
+        this.balance = 1_000_000;
     }
 
     public long getBalance() {
