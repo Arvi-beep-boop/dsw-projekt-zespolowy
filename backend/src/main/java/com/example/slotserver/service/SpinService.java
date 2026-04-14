@@ -14,7 +14,7 @@ import java.util.List;
 public class SpinService {
 
     private final SlotEngine slotEngine;
-    private long balance = 10000;
+    private long balance = 1_000_000;
 
     public SpinService(SlotEngine slotEngine) {
         this.slotEngine = slotEngine;
@@ -26,6 +26,10 @@ public class SpinService {
         final var spinResult = slotEngine.spin(spinRequest);
         this.balance = Math.addExact(balance, spinResult.getLast().cumulativeWinMoney);
         return new SpinResponse(spinResult, balance);
+    }
+
+    public void resetBalance() {
+        this.balance = 1_000_000;
     }
 
     public long getBalance() {
