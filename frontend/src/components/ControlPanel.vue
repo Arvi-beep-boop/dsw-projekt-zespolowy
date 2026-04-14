@@ -8,7 +8,8 @@ defineProps({
   balance: Number,
   win: Number,
   currentBet: Number,
-  availableBets: Array
+  availableBets: Array, 
+    isSpinning: Boolean,
 });
 
 defineEmits(['update-bet', 'spin', 'reset']);
@@ -32,7 +33,7 @@ defineEmits(['update-bet', 'spin', 'reset']);
         />
       </div>
         <ResetButton class="bet-container" @reset="$emit('reset')" />
-      <SpinButton @spin="$emit('spin')" />
+      <SpinButton :is-spinning="isSpinning" @spin="$emit('spin')" />
     </div>
     
   </div>

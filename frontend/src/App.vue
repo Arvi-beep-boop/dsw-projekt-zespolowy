@@ -10,7 +10,8 @@ const SCALAR = 100;
 const balance = ref(0);
 const win = ref(0);
 const currentBet = ref(1);
-const availableBets = ref([1, 2, 3, 4]);
+const availableBets = ref([1, 2, 3, 4])
+const isSpinning = ref(false);
 
 const handleBetChange = (newAmount) => {
     currentBet.value = newAmount;
@@ -24,6 +25,8 @@ onMounted(async () => {
 });
 
 const handleSpin = async () => {
+    if (isSpinning.value) return
+    isSpinning.value = true;
     const backendBet = currentBet.value * SCALAR;
 
     try {
@@ -48,9 +51,13 @@ const handleSpin = async () => {
                 await new Promise(resolve => setTimeout(resolve, 2500));
             }
         }
+        
+        isSpinning.value = false;
+        
     } catch (error) {
         console.error(error.message);
         alert("Spin odrzucony: Sprawdź saldo lub stawkę.");
+        isSpinning.value = false;
     }
 };
 
@@ -88,6 +95,7 @@ const handleReload = async () => {
         :win="win" 
         :current-bet="currentBet"
         :available-bets="availableBets"
+        :is-spinning="isSpinning"
         @update-bet="handleBetChange"
         @spin="handleSpin"
         @reset="handleReload"
