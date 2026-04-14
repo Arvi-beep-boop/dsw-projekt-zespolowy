@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import GameLogo from './components/GameLogo.vue';
 import GameDisplay from './components/GameDisplay.vue';
 import ControlPanel from './components/ControlPanel.vue';
-import { fetchInitialState, spinReelsAPI } from './api/gameApi';
+import { fetchInitialState, spinReelsAPI, reloadBalance } from './api/gameApi';
 import { EventBus } from './game/EventBus';
 
 const SCALAR = 100;
@@ -53,6 +53,20 @@ const handleSpin = async () => {
         alert("Spin odrzucony: Sprawdź saldo lub stawkę.");
     }
 };
+
+const handleReload = async () => {
+    try {
+        await reloadBalance();
+        const freshState = await fetchInitialState();
+        
+        if (freshState && freshState.newBalance !== undefined) {
+            balance.value = freshState.newBalance / SCALAR;
+            win.value = 0;
+        }
+    } catch (error) {
+        console.error("Wystąpił błąd:", error);
+    }
+}  
 </script>
 
 <template>
@@ -76,6 +90,7 @@ const handleSpin = async () => {
         :available-bets="availableBets"
         @update-bet="handleBetChange"
         @spin="handleSpin"
+        @reset="handleReload"
       />
 
     </div>
