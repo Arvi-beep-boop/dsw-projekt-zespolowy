@@ -35,3 +35,21 @@ export const spinReelsAPI = async (betAmount) => {
         throw error;
     }
 };
+
+export const reloadBalance = async () => {
+    try {
+        const response = await fetch(`${API_URL}/reload`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Błąd przeładowania konta: ${response.status}`);
+        }
+        return true;
+        
+    } catch (error) {
+        console.error("Błąd komunikacji podczas reloadu:", error);
+        throw error;
+    }
+};

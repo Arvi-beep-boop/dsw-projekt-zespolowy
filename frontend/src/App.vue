@@ -3,14 +3,15 @@ import { ref, onMounted } from 'vue';
 import GameLogo from './components/GameLogo.vue';
 import GameDisplay from './components/GameDisplay.vue';
 import ControlPanel from './components/ControlPanel.vue';
-import { fetchInitialState, spinReelsAPI } from './api/gameApi';
+import { fetchInitialState, spinReelsAPI, reloadBalance } from './api/gameApi';
 import { EventBus } from './game/EventBus';
 
 const SCALAR = 100;
 const balance = ref(0);
 const win = ref(0);
 const currentBet = ref(1);
-const availableBets = ref([1, 2, 3, 4]);
+const availableBets = ref([1, 2, 3, 4])
+const isSpinning = ref(false);
 
 const handleBetChange = (newAmount) => {
     currentBet.value = newAmount;
@@ -24,6 +25,8 @@ onMounted(async () => {
 });
 
 const handleSpin = async () => {
+    if (isSpinning.value) return
+    isSpinning.value = true;
     const backendBet = currentBet.value * SCALAR;
 
     try {
@@ -48,11 +51,29 @@ const handleSpin = async () => {
                 await new Promise(resolve => setTimeout(resolve, 2500));
             }
         }
+        
+        isSpinning.value = false;
+        
     } catch (error) {
         console.error(error.message);
         alert("Spin odrzucony: Sprawdź saldo lub stawkę.");
+        isSpinning.value = false;
     }
 };
+
+const handleReload = async () => {
+    try {
+        await reloadBalance();
+        const freshState = await fetchInitialState();
+        
+        if (freshState && freshState.newBalance !== undefined) {
+            balance.value = freshState.newBalance / SCALAR;
+            win.value = 0;
+        }
+    } catch (error) {
+        console.error("Wystąpił błąd:", error);
+    }
+}  
 </script>
 
 <template>
@@ -74,8 +95,10 @@ const handleSpin = async () => {
         :win="win" 
         :current-bet="currentBet"
         :available-bets="availableBets"
+        :is-spinning="isSpinning"
         @update-bet="handleBetChange"
         @spin="handleSpin"
+        @reset="handleReload"
       />
 
     </div>

@@ -2,15 +2,17 @@
 import StatDisplay from './StatDisplay.vue';
 import BetSelector from './BetSelector.vue';
 import SpinButton from './SpinButton.vue';
+import ResetButton from './ResetButton.vue';
 
 defineProps({
   balance: Number,
   win: Number,
   currentBet: Number,
-  availableBets: Array
+  availableBets: Array, 
+    isSpinning: Boolean,
 });
 
-defineEmits(['update-bet', 'spin']);
+defineEmits(['update-bet', 'spin', 'reset']);
 </script>
 
 <template>
@@ -30,7 +32,8 @@ defineEmits(['update-bet', 'spin']);
           @update-bet="$emit('update-bet', $event)" 
         />
       </div>
-      <SpinButton @spin="$emit('spin')" />
+        <ResetButton class="bet-container" @reset="$emit('reset')" />
+      <SpinButton :is-spinning="isSpinning" @spin="$emit('spin')" />
     </div>
     
   </div>
