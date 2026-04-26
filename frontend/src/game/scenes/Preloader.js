@@ -21,9 +21,48 @@ export class Preloader extends Scene {
         this.load.image('M2', 'reels/M2.webp');
         this.load.image('SCATTER', 'reels/SCATTER.webp');
         this.load.image('WILD', 'reels/WILD.webp');
+
+        // Load 27 animation frames for l1, l2, l3 wins (bez spacji w nazwie folderu)
+        for (let i = 1; i <= 27; i++) {
+            const frameNum = String(i).padStart(3, '0');
+            this.load.image(`l1-win-frame-${i}`, `animations/l1win/ezgif-frame-${frameNum}.png`);
+            this.load.image(`l2-win-frame-${i}`, `animations/l2win/ezgif-frame-${frameNum}.png`);
+            this.load.image(`l3-win-frame-${i}`, `animations/l3win/ezgif-frame-${frameNum}.png`);
+        }
     }
 
     create() {
+        // Create the animation from the loaded frames
+        const l1Frames = [];
+        const l2Frames = [];
+        const l3Frames = [];
+        for (let i = 1; i <= 27; i++) {
+            l1Frames.push({ key: `l1-win-frame-${i}` });
+            l2Frames.push({ key: `l2-win-frame-${i}` });
+            l3Frames.push({ key: `l3-win-frame-${i}` });
+        }
+        
+        this.anims.create({
+            key: 'l1-win-anim',
+            frames: l1Frames,
+            frameRate: 15, // Zwolnione tempo, by klatki starczyły na zbliżenie się do ~3 sekund bez pętli
+            repeat: 0 // Do not loop
+        });
+        
+        this.anims.create({
+            key: 'l2-win-anim',
+            frames: l2Frames,
+            frameRate: 15, // Takie same wartości jak l1
+            repeat: 0
+        });
+
+        this.anims.create({
+            key: 'l3-win-anim',
+            frames: l3Frames,
+            frameRate: 15, // Takie same wartości dla wszystkich wygranych
+            repeat: 0
+        });
+
         this.scene.start('Game');
     }
 }
