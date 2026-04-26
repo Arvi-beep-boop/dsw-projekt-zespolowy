@@ -2,6 +2,14 @@ export const SYMBOL_MAP = {
     1: 'H1', 2: 'H2', 3: 'M1', 4: 'M2', 5: 'L1', 6: 'L2', 7: 'L3', 8: 'SCATTER', 9: 'WILD'
 };
 
+export const WIN_LINES = {
+    0: [{col: 0, row: 0}, {col: 1, row: 0}, {col: 2, row: 0}], // Górny wiersz
+    1: [{col: 0, row: 1}, {col: 1, row: 1}, {col: 2, row: 1}], // Środkowy wiersz
+    2: [{col: 0, row: 2}, {col: 1, row: 2}, {col: 2, row: 2}], // Dolny wiersz
+    3: [{col: 0, row: 0}, {col: 1, row: 1}, {col: 2, row: 2}], // Przekątna w dół
+    4: [{col: 0, row: 2}, {col: 1, row: 1}, {col: 2, row: 0}]  // Przekątna w górę
+};
+
 const API_URL = '/api/v1';
 
 export const fetchInitialState = async () => {

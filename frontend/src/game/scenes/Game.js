@@ -1,12 +1,13 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import Reel from '../components/Reel';
-import { SYMBOL_MAP } from '../../api/gameApi'; // Import słownika symboli
+import { SYMBOL_MAP, WIN_LINES } from '../../api/gameApi'; // Import słownika symbolów i linii wygrywających
 
 export class Game extends Scene {
     constructor() {
         super('Game');
         this.reels = [];
+        this.activeWinAnimations = [];
     }
 
     create ()
@@ -43,6 +44,8 @@ export class Game extends Scene {
         
         EventBus.on('spin-start', () => {
             if (this.reels.some(r => r.isSpinning)) return;
+            // Czyszczenie animacji po poprzednim spinie
+            this.clearWinAnimations();
             this.reels.forEach(reel => reel.startSpin());
         });
         
@@ -53,12 +56,81 @@ export class Game extends Scene {
             const targetReel1 = [ matrix[0][1], matrix[1][1], matrix[2][1] ].map(id => SYMBOL_MAP[id]);
             const targetReel2 = [ matrix[0][2], matrix[1][2], matrix[2][2] ].map(id => SYMBOL_MAP[id]);
             
-            this.time.delayedCall(1000, () => this.reels[0].stopSpin(targetReel0));
-            this.time.delayedCall(1500, () => this.reels[1].stopSpin(targetReel1));
-            this.time.delayedCall(2000, () => this.reels[2].stopSpin(targetReel2));
+            this.time.delayedCall(400, () => this.reels[0].stopSpin(targetReel0));
+            this.time.delayedCall(700, () => this.reels[1].stopSpin(targetReel1));
+            this.time.delayedCall(1000, () => {
+                this.reels[2].stopSpin(targetReel2);
+                
+                // Po zatrzymaniu ostatniego bębna, pokazujemy animacje wygranych (z lekkim opóźnieniem)
+                if (backendGrid.winLineWinData && backendGrid.winLineWinData.length > 0) {
+                    this.time.delayedCall(300, () => this.showWins(backendGrid.winLineWinData, backendGrid.grid));
+                }
+            });
         });
 
         EventBus.emit('current-scene-ready', this);
+    }
+    
+    clearWinAnimations() {
+        this.activeWinAnimations.forEach(anim => {
+            if (anim) anim.destroy();
+        });
+        this.activeWinAnimations = [];
+    }
+
+    showWins(winLineWinData, grid) {
+        if (!winLineWinData || winLineWinData.length === 0) return;
+
+        const w = this.scale.width;
+        const h = this.scale.height;
+        const colW = Math.ceil(w / 3);
+        const rowH = Math.ceil(h / 3);
+
+        winLineWinData.forEach(winData => {
+            const lineCoords = WIN_LINES[winData.winLineId];
+            if (!lineCoords) return;
+
+            // Najbezpieczniejsza metoda: odczytujemy ID symbolu bezpośrednio z tego, co zwrócił backend (WinLineData)
+            const symbolId = winData.symbol;
+            if (!symbolId) return; // Zabezpieczenie na wypadek braku danych
+
+            const symbolKey = SYMBOL_MAP[symbolId].toLowerCase(); // Zmienia np. 'L3' na 'l3'
+            
+            const animKey = `${symbolKey}-win-anim`;
+            const frameKey = `${symbolKey}-win-frame-1`;
+
+            console.log(`🎰 Wygrywająca linia: ID=${winData.winLineId}, Symbol=${symbolKey.toUpperCase()}`);
+
+            // Sprawdzamy czy mamy taką animację
+            if (!this.anims.exists(animKey)) {
+                console.warn(`⚠️ Brak animacji w grze: ${animKey}! Symbol ${symbolKey.toUpperCase()} jeszcze jej nie posiada.`);
+                return;
+            }
+
+            // Dla wygrywającej linii renderujemy animację na każdym symbolu
+            for (let i = 0; i < lineCoords.length; i++) {
+                const coord = lineCoords[i];
+                if (!coord) continue;
+
+                // Obliczamy środek kafelka na siatce
+                const posX = (coord.col * colW) + (colW / 2);
+                const posY = (coord.row * rowH) + (rowH / 2);
+
+                const animSprite = this.add.sprite(posX, posY, frameKey);
+                animSprite.setDepth(200);
+                
+                // Idealne dopasowanie wymiarów kafelka
+                animSprite.setDisplaySize(colW, rowH);
+                
+                animSprite.play(animKey);
+                this.activeWinAnimations.push(animSprite);
+            }
+        });
+
+        // Usuń animacje po upływie 2 sekund (dopasowane do skróconej animacji)
+        this.time.delayedCall(2000, () => {
+            this.clearWinAnimations();
+        });
     }
 
     update() {

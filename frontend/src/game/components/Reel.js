@@ -12,7 +12,7 @@ export default class Reel extends Phaser.GameObjects.Container {
         this.poolSize = this.visibleSlots + 2;
         this.activeSymbols = [];
         this.isSpinning = false;
-        this.spinSpeed = 30;
+        this.spinSpeed = 60;
         this.targetSymbols = null;
 
         this.initPool();

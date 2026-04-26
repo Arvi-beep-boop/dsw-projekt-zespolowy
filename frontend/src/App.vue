@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import GameLogo from './components/GameLogo.vue';
 import GameDisplay from './components/GameDisplay.vue';
 import ControlPanel from './components/ControlPanel.vue';
+import CoinFountain from './components/CoinFountain.vue';
 import { fetchInitialState, spinReelsAPI, reloadBalance } from './api/gameApi';
 import { EventBus } from './game/EventBus';
 
@@ -46,9 +47,22 @@ const handleSpin = async () => {
                     EventBus.emit('spin-start');
                 }
                 
-                EventBus.emit('spin-stop', result.grid);
+                EventBus.emit('spin-stop', result);
                 win.value = result.cumulativeWinMoney / SCALAR;
-                await new Promise(resolve => setTimeout(resolve, 2500));
+                
+                // Dostosowanie cooldownu:
+                // Game.js potrzebuje 1300ms (1000ms bębny + 300ms opóźnienia) zanim pokaże wygraną.
+                // Potem animacja trwa 2000ms. Razem: 3300ms.
+                const hasWin = result.winLineWinData && result.winLineWinData.length > 0;
+                const cooldownTime = hasWin ? 3400 : 1200; // 100ms bezpiecznego bufora
+                
+                if (hasWin) {
+                    setTimeout(() => {
+                        EventBus.emit('trigger-fountain');
+                    }, 1300); // Wybuch monet zsynchronizowany idealnie z pojawieniem się animacji kafelków (1300ms)
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, cooldownTime));
             }
         }
         
@@ -78,6 +92,7 @@ const handleReload = async () => {
 
 <template>
   <div class="app-wrapper"> 
+    <CoinFountain />
     <GameLogo />
     
     <div class="machine-container">
