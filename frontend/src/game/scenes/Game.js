@@ -80,6 +80,7 @@ export class Game extends Scene {
 
     showWins(winLineWinData, grid) {
         if (!winLineWinData || winLineWinData.length === 0) return;
+        if (this.reels.some(r => r.isSpinning)) return; // Blokuje animację, jeśli gracz już zakręcił ponownie
 
         const w = this.scale.width;
         const h = this.scale.height;
@@ -127,8 +128,8 @@ export class Game extends Scene {
             }
         });
 
-        // Usuń animacje po upływie 2 sekund (dopasowane do skróconej animacji)
-        this.time.delayedCall(2000, () => {
+        // Usuń animacje po upływie 2.3 sekund (dopasowane do skróconej animacji)
+        this.time.delayedCall(2300, () => {
             this.clearWinAnimations();
         });
     }
