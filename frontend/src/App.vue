@@ -4,6 +4,8 @@ import GameLogo from './components/GameLogo.vue';
 import GameDisplay from './components/GameDisplay.vue';
 import ControlPanel from './components/ControlPanel.vue';
 import CoinFountain from './components/CoinFountain.vue';
+import LebronEgg from './components/LebronEgg.vue';
+import WinIndicator from './components/WinIndicator.vue';
 import { fetchInitialState, spinReelsAPI, reloadBalance } from './api/gameApi';
 import { EventBus } from './game/EventBus';
 
@@ -96,6 +98,7 @@ const handleReload = async () => {
 <template>
   <div class="app-wrapper"> 
     <CoinFountain />
+    <LebronEgg />
     <GameLogo />
     
     <div class="machine-container">
@@ -103,6 +106,7 @@ const handleReload = async () => {
       <div class="top-section">
         <div class="game-section">
           <GameDisplay />
+          <WinIndicator />
         </div>
       </div>
       <!--Wstrzykujemy bieżące wartości ze stanu UI (const balance, win itp.) do komponentu. 
@@ -172,6 +176,7 @@ const handleReload = async () => {
 }
 
 .game-section { 
+  position: relative;
   width: 100%; 
   height: 100%;
 }
