@@ -21,6 +21,7 @@ export class Preloader extends Scene {
         this.load.image('M2', 'reels/M2.webp');
         this.load.image('SCATTER', 'reels/SCATTER.webp');
         this.load.image('WILD', 'reels/WILD.webp');
+        this.load.audio('bg-music', 'audio/bgm.wav');
 
         // Load 15 animation frames for l1, l2, l3 wins
         for (let i = 1; i <= 15; i++) {

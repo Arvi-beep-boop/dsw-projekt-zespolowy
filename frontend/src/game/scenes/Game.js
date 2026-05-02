@@ -15,6 +15,14 @@ export class Game extends Scene {
         const w = this.scale.width;
         const h = this.scale.height;
         this.cameras.main.setBackgroundColor(0x222222);
+
+        if (!this.sound.get('bg-music')) {
+            this.bgMusic = this.sound.add('bg-music', { 
+                loop: true,
+                volume: 0.4
+            });
+            this.bgMusic.play();
+        }
         
         const stripPattern1 = ['H1', 'L1', 'M2', 'WILD', 'L2', 'SCATTER', 'H2', 'L3', 'M1'];
         const stripPattern2 = ['L3', 'WILD', 'H1', 'M1', 'SCATTER', 'L1', 'H2', 'L2', 'M2'];
