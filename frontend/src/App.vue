@@ -50,16 +50,19 @@ const handleSpin = async () => {
                 EventBus.emit('spin-stop', result);
                 win.value = result.cumulativeWinMoney / SCALAR;
                 
-                // Dostosowanie cooldownu:
-                // Game.js potrzebuje 1300ms (1000ms bębny + 300ms opóźnienia) zanim pokaże wygraną.
-                // Potem animacja trwa 2000ms. Razem: 3300ms.
                 const hasWin = result.winLineWinData && result.winLineWinData.length > 0;
-                const cooldownTime = hasWin ? 3400 : 1200; // 100ms bezpiecznego bufora
+                const isLast = i === response.gameResult.length - 1;
+                // Odblokowujemy przycisk "Spin" zaraz po zatrzymaniu bębnów (1100ms).
+                // Dzięki temu gracz może pominąć animację wygranej, jeśli chce grać szybciej.
+                const cooldownTime = (hasWin && !isLast) ? 3400 : 1100;
                 
                 if (hasWin) {
                     setTimeout(() => {
-                        EventBus.emit('trigger-fountain');
-                    }, 1300); // Wybuch monet zsynchronizowany idealnie z pojawieniem się animacji kafelków (1300ms)
+                        // Odpal fontannę tylko jeśli gracz nie kliknął już kolejnego spina
+                        if (!isSpinning.value || !isLast) {
+                            EventBus.emit('trigger-fountain');
+                        }
+                    }, 1300);
                 }
                 
                 await new Promise(resolve => setTimeout(resolve, cooldownTime));
