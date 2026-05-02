@@ -68,6 +68,10 @@ export class Game extends Scene {
             });
         });
 
+        EventBus.on('lebron-flash', () => {
+            this.showLebronFlash();
+        });
+
         EventBus.emit('current-scene-ready', this);
     }
     
@@ -76,6 +80,7 @@ export class Game extends Scene {
             if (anim) anim.destroy();
         });
         this.activeWinAnimations = [];
+        EventBus.emit('win-lines-clear');
     }
 
     showWins(winLineWinData, grid) {
@@ -87,9 +92,12 @@ export class Game extends Scene {
         const colW = Math.ceil(w / 3);
         const rowH = Math.ceil(h / 3);
 
+        const winningRows = new Set();
+
         winLineWinData.forEach(winData => {
             const lineCoords = WIN_LINES[winData.winLineId];
             if (!lineCoords) return;
+            lineCoords.forEach(c => winningRows.add(c.row));
 
             // Najbezpieczniejsza metoda: odczytujemy ID symbolu bezpośrednio z tego, co zwrócił backend (WinLineData)
             const symbolId = winData.symbol;
@@ -119,17 +127,49 @@ export class Game extends Scene {
 
                 const animSprite = this.add.sprite(posX, posY, frameKey);
                 animSprite.setDepth(200);
-                
-                // Idealne dopasowanie wymiarów kafelka
                 animSprite.setDisplaySize(colW, rowH);
-                
                 animSprite.play(animKey);
                 this.activeWinAnimations.push(animSprite);
+
+                const flashSprite = this.add.sprite(posX, posY, 'flash-frame-1');
+                flashSprite.setDepth(210);
+                flashSprite.setDisplaySize(colW, rowH);
+                flashSprite.setBlendMode(Phaser.BlendModes.ADD);
+                flashSprite.setAlpha(0.75);
+                flashSprite.play('flash-line-anim');
+                this.activeWinAnimations.push(flashSprite);
             }
         });
 
-        // Usuń animacje po upływie 2.3 sekund (dopasowane do skróconej animacji)
+        EventBus.emit('win-lines-active', [...winningRows]);
+
         this.time.delayedCall(2300, () => {
+            this.clearWinAnimations();
+        });
+    }
+
+    showLebronFlash() {
+        const w = this.scale.width;
+        const h = this.scale.height;
+        const colW = Math.ceil(w / 3);
+        const rowH = Math.ceil(h / 3);
+
+        for (let row = 0; row < 3; row++) {
+            for (let col = 0; col < 3; col++) {
+                const posX = (col * colW) + (colW / 2);
+                const posY = (row * rowH) + (rowH / 2);
+
+                const flashSprite = this.add.sprite(posX, posY, 'flash-frame-1');
+                flashSprite.setDepth(210);
+                flashSprite.setDisplaySize(colW, rowH);
+                flashSprite.setBlendMode(Phaser.BlendModes.ADD);
+                flashSprite.setAlpha(0.75);
+                flashSprite.play('flash-line-anim');
+                this.activeWinAnimations.push(flashSprite);
+            }
+        }
+
+        this.time.delayedCall(4000, () => {
             this.clearWinAnimations();
         });
     }

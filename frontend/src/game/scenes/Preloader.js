@@ -59,6 +59,11 @@ export class Preloader extends Scene {
             const frameNum = String(i).padStart(3, '0');
             this.load.image(`scatter-win-frame-${i}`, `animations/scatterwin/ezgif-frame-${frameNum}.png`);
         }
+
+        for (let i = 1; i <= 31; i++) {
+            const frameNum = String(i).padStart(3, '0');
+            this.load.image(`flash-frame-${i}`, `animations/flash/ezgif-frame-${frameNum}.png`);
+        }
     }
 
     create() {
@@ -149,6 +154,17 @@ export class Preloader extends Scene {
         this.anims.create({
             key: 'scatter-win-anim',
             frames: scatterFrames,
+            frameRate: 11.74,
+            repeat: 0
+        });
+
+        const flashFrames = [];
+        for (let i = 1; i <= 31; i++) {
+            flashFrames.push({ key: `flash-frame-${i}` });
+        }
+        this.anims.create({
+            key: 'flash-line-anim',
+            frames: flashFrames,
             frameRate: 11.74,
             repeat: 0
         });
