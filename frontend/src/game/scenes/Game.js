@@ -51,11 +51,15 @@ export class Game extends Scene {
         gridGfx.strokePath();
         gridGfx.setDepth(100);
         
+        EventBus.on('play-audio', (key) => {
+        this.sound.play(key, { volume: 1 });
+        });
+
         EventBus.on('spin-start', () => {
             if (this.reels.some(r => r.isSpinning)) return;
             // Czyszczenie animacji po poprzednim spinie
             this.clearWinAnimations();
-            this.sound.play('reels-spin', { volume: 0.5 });
+            this.sound.play('reels-spin', { volume: 0.7 });
             this.reels.forEach(reel => reel.startSpin());
         });
         
@@ -68,15 +72,15 @@ export class Game extends Scene {
             
             this.time.delayedCall(0, () => {
                 this.reels[0].stopSpin(targetReel0);
-                this.sound.play('reels-stop-1', { volume: 0.35 }); 
+                this.sound.play('reels-stop-1', { volume: 0.5 }); 
             });
             this.time.delayedCall(600, () => {
                 this.reels[1].stopSpin(targetReel1);
-                this.sound.play('reels-stop-2', { volume: 0.35 }); 
+                this.sound.play('reels-stop-2', { volume: 0.5 }); 
             });
             this.time.delayedCall(1400, () => {
                 this.reels[2].stopSpin(targetReel2);
-                this.sound.play('reels-stop-3', { volume: 0.35 });
+                this.sound.play('reels-stop-3', { volume: 0.5 });
                 
                 // Po zatrzymaniu ostatniego bębna, pokazujemy animacje wygranych (z lekkim opóźnieniem)
                 if (backendGrid.winLineWinData && backendGrid.winLineWinData.length > 0) {

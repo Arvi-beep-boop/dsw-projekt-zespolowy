@@ -50,6 +50,7 @@ const handleSpin = async () => {
                 await new Promise(resolve => setTimeout(resolve, 600));
                 
                 EventBus.emit('spin-stop', result);
+                await new Promise(resolve => setTimeout(resolve, 800));
                 win.value = result.cumulativeWinMoney / SCALAR;
                 
                 const hasWin = result.winLineWinData && result.winLineWinData.length > 0;
