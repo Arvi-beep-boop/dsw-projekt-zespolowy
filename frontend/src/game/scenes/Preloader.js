@@ -23,6 +23,9 @@ export class Preloader extends Scene {
         this.load.image('WILD', 'reels/WILD.webp');
         this.load.audio('bg-music', 'audio/bgm.wav');
         this.load.audio('reels-spin', 'audio/reels-spin.wav');
+        this.load.audio('reels-stop-1', 'audio/reels-stop-1.wav');
+        this.load.audio('reels-stop-2', 'audio/reels-stop-2.wav');
+        this.load.audio('reels-stop-3', 'audio/reels-stop-3.wav');
 
         // Load 15 animation frames for l1, l2, l3 wins
         for (let i = 1; i <= 15; i++) {
