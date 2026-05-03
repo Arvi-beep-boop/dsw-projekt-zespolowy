@@ -43,11 +43,11 @@ const handleSpin = async () => {
                 const result = response.gameResult[i];
                 
                 if (i > 0) {
-                    EventBus.emit('spin-start');
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                } else {
-                    EventBus.emit('spin-start');
+                    await new Promise(resolve => setTimeout(resolve, 600));
                 }
+                
+                EventBus.emit('spin-start');
+                await new Promise(resolve => setTimeout(resolve, 600));
                 
                 EventBus.emit('spin-stop', result);
                 win.value = result.cumulativeWinMoney / SCALAR;

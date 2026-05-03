@@ -23,6 +23,7 @@ export class Game extends Scene {
             });
             this.bgMusic.play();
         }
+
         
         const stripPattern1 = ['H1', 'L1', 'M2', 'WILD', 'L2', 'SCATTER', 'H2', 'L3', 'M1'];
         const stripPattern2 = ['L3', 'WILD', 'H1', 'M1', 'SCATTER', 'L1', 'H2', 'L2', 'M2'];
@@ -54,6 +55,7 @@ export class Game extends Scene {
             if (this.reels.some(r => r.isSpinning)) return;
             // Czyszczenie animacji po poprzednim spinie
             this.clearWinAnimations();
+            this.sound.play('reels-spin', { volume: 0.5 });
             this.reels.forEach(reel => reel.startSpin());
         });
         
