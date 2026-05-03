@@ -7,9 +7,9 @@ const props = defineProps({
 defineEmits(['spin']);
 watch(() => props.isSpinning, (newValue) => {
     if (newValue === true) {
-        EventBus.emit('play-audio', 'btn-press');
+        EventBus.emit('play-audio', 'btn-press', 1, 0);
     } else {
-        EventBus.emit('play-audio', 'btn-release');
+        EventBus.emit('play-audio', 'btn-release', 1,  0);
     }
 });
 </script>

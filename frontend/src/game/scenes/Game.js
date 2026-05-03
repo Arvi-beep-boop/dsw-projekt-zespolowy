@@ -19,7 +19,7 @@ export class Game extends Scene {
         if (!this.sound.get('bg-music')) {
             this.bgMusic = this.sound.add('bg-music', { 
                 loop: true,
-                volume: 0.9
+                volume: 0.5
             });
             this.bgMusic.play();
         }
@@ -51,15 +51,79 @@ export class Game extends Scene {
         gridGfx.strokePath();
         gridGfx.setDepth(100);
         
-        EventBus.on('play-audio', (key) => {
-        this.sound.play(key, { volume: 1 });
+
+        EventBus.on('play-audio', (key, volume = 1, delay = 0) => {
+            const playLogic = () => {
+                // --- BLOKADA DUBLOWANIA SCATTERA ---
+                if (key === 'win-scatter') {
+                    // Pobieramy WSZYSTKIE instancje tego dźwięku
+                    const existingSounds = this.sound.getAll('win-scatter');
+                    // Sprawdzamy czy którakolwiek z nich aktualnie gra
+                    if (existingSounds.some(s => s.isPlaying)) return;
+                }
+
+                this.sound.play(key, { volume: volume });
+            };
+
+            if (delay > 0) {
+                this.time.delayedCall(delay, playLogic);
+            } else {
+                playLogic();
+            }
+        });
+
+        // wyłączenie scattera
+        EventBus.on('stop-audio', (key, duration = 1000) => {
+            // Zmieniamy get na getAll, żeby wyłapać wszystkie instancje
+            const sounds = this.sound.getAll(key);
+            
+            sounds.forEach(sound => {
+                if (sound && sound.isPlaying) {
+                    this.tweens.add({
+                        targets: sound,
+                        volume: 0,
+                        duration: duration,
+                        onComplete: () => {
+                            sound.stop();
+                            sound.destroy(); // usuwa użyty dźwięk z pamięci
+                        }
+                    });
+                } else if (sound) {
+                    // Jeśli jakiś stary dźwięk "wisi" zatrzymany, od razu go czyścimy
+                    sound.destroy(); 
+                }
+            });
+        });
+
+        EventBus.on('bg-music-fade-out', (duration = 300) => {
+            if (this.bgMusic) {
+                // Tween płynnie zmienia głośność od obecnej do 0 w określonym czasie
+                this.tweens.add({
+                    targets: this.bgMusic,
+                    volume: 0,
+                    duration: duration
+                });
+            }
+        });
+
+        
+
+        // Płynne podgłośnienie muzyki w tle (fade in)
+        EventBus.on('bg-music-fade-in', (duration = 300, targetVolume = 0.5) => {
+            if (this.bgMusic) {
+                this.tweens.add({
+                    targets: this.bgMusic,
+                    volume: targetVolume,
+                    duration: duration
+                });
+            }
         });
 
         EventBus.on('spin-start', () => {
             if (this.reels.some(r => r.isSpinning)) return;
             // Czyszczenie animacji po poprzednim spinie
             this.clearWinAnimations();
-            this.sound.play('reels-spin', { volume: 0.7 });
+            this.sound.play('reels-spin', { volume: 0.5 });
             this.reels.forEach(reel => reel.startSpin());
         });
         
@@ -72,15 +136,15 @@ export class Game extends Scene {
             
             this.time.delayedCall(0, () => {
                 this.reels[0].stopSpin(targetReel0);
-                this.sound.play('reels-stop-1', { volume: 0.5 }); 
+                this.sound.play('reels-stop-1', { volume: 0.3 }); 
             });
             this.time.delayedCall(600, () => {
                 this.reels[1].stopSpin(targetReel1);
-                this.sound.play('reels-stop-2', { volume: 0.5 }); 
+                this.sound.play('reels-stop-2', { volume: 0.3 }); 
             });
             this.time.delayedCall(1400, () => {
                 this.reels[2].stopSpin(targetReel2);
-                this.sound.play('reels-stop-3', { volume: 0.5 });
+                this.sound.play('reels-stop-3', { volume: 0.3 });
                 
                 // Po zatrzymaniu ostatniego bębna, pokazujemy animacje wygranych (z lekkim opóźnieniem)
                 if (backendGrid.winLineWinData && backendGrid.winLineWinData.length > 0) {

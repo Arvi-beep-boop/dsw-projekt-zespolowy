@@ -30,6 +30,7 @@ onMounted(async () => {
 const handleSpin = async () => {
     if (isSpinning.value) return
     isSpinning.value = true;
+    let musicWasFaded = false;
     const backendBet = currentBet.value * SCALAR;
 
     try {
@@ -50,18 +51,53 @@ const handleSpin = async () => {
                 await new Promise(resolve => setTimeout(resolve, 600));
                 
                 EventBus.emit('spin-stop', result);
-                await new Promise(resolve => setTimeout(resolve, 800));
+                await new Promise(resolve => setTimeout(resolve, 400));
                 win.value = result.cumulativeWinMoney / SCALAR;
                 
                 const hasWin = result.winLineWinData && result.winLineWinData.length > 0;
                 const isLast = i === response.gameResult.length - 1;
                 // Odblokowujemy przycisk "Spin" zaraz po zatrzymaniu bębnów (1100ms).
                 // Dzięki temu gracz może pominąć animację wygranej, jeśli chce grać szybciej.
-                const cooldownTime = (hasWin && !isLast) ? 3400 : 1100;
+                const cooldownTime = (hasWin && !isLast) ? 3400 : 1200;
                 
+                if (result.numFreeSpinsAwarded > 0) {
+                    if (!musicWasFaded) {
+                        EventBus.emit('bg-music-fade-out', 1000);
+                        musicWasFaded = true; 
+                    }
+                    EventBus.emit('play-audio', 'win-scatter', 0.5, 1400);
+                }
+
                 if (hasWin) {
+                    const soundToPlay = getWinSoundKey(result);
+                    
+                    let myVol = 0.9;
+                    let myDelay = 1400;
+
+                    // --- 1. LOGIKA MUZYKI TŁA (SCATTER) ---
+                    if (result.numFreeSpinsAwarded > 0) {
+                        if (!musicWasFaded) {
+                            EventBus.emit('bg-music-fade-out', 1000);
+                            musicWasFaded = true; 
+                        }
+                        // Głośność scattera obniżona, by linie mogły się przebić przez tło
+                        EventBus.emit('play-audio', 'win-scatter', 0.5, myDelay);
+                    }
+
+                    // --- 2. LOGIKA EFEKTÓW LINII WYGRYWAJĄCYCH ---
+                    if (soundToPlay) {
+                        if (soundToPlay === 'win-high') {
+                            EventBus.emit('play-audio', 'win-high', myVol, myDelay);
+                        } 
+                        else if (soundToPlay === 'win-medium') {
+                            EventBus.emit('play-audio', 'win-medium', myVol, myDelay);
+                        } 
+                        else if (soundToPlay === 'win-low') {
+                            EventBus.emit('play-audio', 'win-low', myVol, myDelay);
+                        }
+                    }
+
                     setTimeout(() => {
-                        // Odpal fontannę tylko jeśli gracz nie kliknął już kolejnego spina
                         if (!isSpinning.value || !isLast) {
                             EventBus.emit('trigger-fountain');
                         }
@@ -72,6 +108,13 @@ const handleSpin = async () => {
             }
         }
         
+        if (musicWasFaded) {
+            // Wycisz muzyke scattera, wartość fade-out = 750ms
+            EventBus.emit('stop-audio', 'win-scatter', 750);
+            // Włącz background music, wartość fade-in = 750ms, docelowa głośność na powrót 0.7 max głośności
+            EventBus.emit('bg-music-fade-in', 750, 0.7);
+        }
+
         isSpinning.value = false;
         
     } catch (error) {
@@ -79,6 +122,36 @@ const handleSpin = async () => {
         alert("Spin odrzucony: Sprawdź saldo lub stawkę.");
         isSpinning.value = false;
     }
+};
+
+const getWinSoundKey = (result) => {
+    if (!result.winLineWinData || result.winLineWinData.length === 0) {
+        return null;
+    }
+
+    let hasHigh = false;
+    let hasMedium = false;
+    let hasLow = false;
+
+    for (const line of result.winLineWinData) {
+        const symbolId = line.symbol; 
+        
+        if (symbolId === 1 || symbolId === 2 || symbolId === 9) {
+            hasHigh = true;
+        } 
+        else if (symbolId === 3 || symbolId === 4) {
+            hasMedium = true;
+        }
+        else if (symbolId === 5 || symbolId === 6 || symbolId === 7) {
+            hasLow = true;
+        }
+    }
+
+    if (hasHigh) return 'win-high';
+    if (hasMedium) return 'win-medium';
+    if (hasLow) return 'win-low';
+    
+    return null;
 };
 
 const handleReload = async () => {
