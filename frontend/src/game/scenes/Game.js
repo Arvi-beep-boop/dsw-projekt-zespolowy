@@ -2,6 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import Reel from '../components/Reel';
 import { SYMBOL_MAP, WIN_LINES } from '../../api/gameApi'; // Import słownika symbolów i linii wygrywających
+import { AUDIO_SETTINGS } from '../settings';
 
 export class Game extends Scene {
     constructor() {
@@ -129,22 +130,27 @@ export class Game extends Scene {
         
         EventBus.on('spin-stop', (backendGrid) => {
             const matrix = backendGrid.grid || backendGrid;
+            const vol = AUDIO_SETTINGS.volumes.reelsStop; // Pobieramy z settings.js ustawienia dzwieku dal efektu zatrzyamnia bębna
             
             const targetReel0 = [ matrix[0][0], matrix[1][0], matrix[2][0] ].map(id => SYMBOL_MAP[id]);
             const targetReel1 = [ matrix[0][1], matrix[1][1], matrix[2][1] ].map(id => SYMBOL_MAP[id]);
             const targetReel2 = [ matrix[0][2], matrix[1][2], matrix[2][2] ].map(id => SYMBOL_MAP[id]);
-            
+
             this.time.delayedCall(0, () => {
                 this.reels[0].stopSpin(targetReel0);
-                this.sound.play('reels-stop-1', { volume: 0.3 }); 
+                this.sound.play('reels-stop-1', { volume: vol }); 
             });
+
             this.time.delayedCall(600, () => {
                 this.reels[1].stopSpin(targetReel1);
-                this.sound.play('reels-stop-2', { volume: 0.3 }); 
+                this.sound.play('reels-stop-2', { volume: vol }); 
             });
+
             this.time.delayedCall(1400, () => {
-                this.reels[2].stopSpin(targetReel2);
-                this.sound.play('reels-stop-3', { volume: 0.3 });
+                this.reels[2].stopSpin(targetReel2, () => {
+                    EventBus.emit('all-reels-stopped', backendGrid);
+                });
+                this.sound.play('reels-stop-3', { volume: vol });
                 
                 // Po zatrzymaniu ostatniego bębna, pokazujemy animacje wygranych (z lekkim opóźnieniem)
                 if (backendGrid.winLineWinData && backendGrid.winLineWinData.length > 0) {

@@ -37,9 +37,10 @@ export default class Reel extends Phaser.GameObjects.Container {
         this.targetSymbols = null;
     }
     
-    stopSpin(targetSymbolsArray) {
+    stopSpin(targetSymbolsArray, onComplete = null) {
         this.stopping = true;
         this.targetSymbols = targetSymbolsArray; // Np. ['H1', 'WILD', 'L2']
+        this.onCompleteCallback = onComplete; // Sygnał, że skończył kręcić bębnami
     }
 
     updateReel() {
@@ -89,6 +90,13 @@ export default class Reel extends Phaser.GameObjects.Container {
             sortedSymbols[3].setTexture(this.targetSymbols[2]); // Dolny wiersz
 
             this.targetSymbols = null;
+
+            
+            // Sprawdzamy czy otrzymaliśmy informację o zatrzymaniu bębnów
+            if (this.onCompleteCallback) {
+                this.onCompleteCallback(); 
+                this.onCompleteCallback = null; // Kasujemy, żeby nie odpaliła się drugi raz
+            }
         }
     }
 }
