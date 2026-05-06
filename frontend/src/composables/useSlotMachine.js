@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import { fetchInitialState, spinReelsAPI, reloadBalance } from '../api/gameApi';
 import { EventBus } from '../game/EventBus';
 import { getWinSoundKey } from '../utils/audioHelpers';
+import { AUDIO_SETTINGS } from '../game/settings';
 
 export function useSlotMachine() {
     const SCALAR = 100;
@@ -46,7 +47,16 @@ export function useSlotMachine() {
                     await new Promise(resolve => setTimeout(resolve, 600));
                     
                     EventBus.emit('spin-stop', result);
-                    await new Promise(resolve => setTimeout(resolve, 400));
+                    
+                    // Vue czeka na sygnał od Phasera, niezależnie ile sekund ustawisz w settings.js
+                    await new Promise(resolve => {
+                        const onReelsStopped = () => {
+                            EventBus.off('all-reels-stopped', onReelsStopped);
+                            resolve();
+                        };
+                        EventBus.on('all-reels-stopped', onReelsStopped);
+                    });
+                    
                     win.value = result.cumulativeWinMoney / SCALAR;
                     
                     const hasWin = result.winLineWinData && result.winLineWinData.length > 0;
@@ -58,13 +68,12 @@ export function useSlotMachine() {
                             EventBus.emit('bg-music-fade-out', 1000);
                             musicWasFaded = true; 
                         }
-                        EventBus.emit('play-audio', 'win-scatter', 0.5, 1400);
+                        EventBus.emit('play-audio', 'win-scatter', 0.5, 0);
                     }
 
                     if (hasWin) {
                         const soundToPlay = getWinSoundKey(result);
-                        let myVol = 0.9;
-                        let myDelay = 1400;
+                        const winVol = AUDIO_SETTINGS.volumes.win; 
 
                         if (result.numFreeSpinsAwarded > 0) {
                             if (!musicWasFaded) {
@@ -76,21 +85,19 @@ export function useSlotMachine() {
 
                         if (soundToPlay) {
                             if (soundToPlay === 'win-high') {
-                                EventBus.emit('play-audio', 'win-high', myVol, myDelay);
+                                EventBus.emit('play-audio', 'win-high', winVol, 0);
                             } 
                             else if (soundToPlay === 'win-medium') {
-                                EventBus.emit('play-audio', 'win-medium', myVol, myDelay);
+                                EventBus.emit('play-audio', 'win-medium', winVol, 0);
                             } 
                             else if (soundToPlay === 'win-low') {
-                                EventBus.emit('play-audio', 'win-low', myVol, myDelay);
+                                EventBus.emit('play-audio', 'win-low', winVol, 0);
                             }
                         }
 
-                        setTimeout(() => {
-                            if (!isSpinning.value || !isLast) {
-                                EventBus.emit('trigger-fountain');
-                            }
-                        }, 1300);
+                        if (!isSpinning.value || !isLast) {
+                            EventBus.emit('trigger-fountain');
+                        }
                     }
                     
                     await new Promise(resolve => setTimeout(resolve, cooldownTime));

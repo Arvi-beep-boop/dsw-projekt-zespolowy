@@ -154,7 +154,7 @@ export class Game extends Scene {
                 
                 // Po zatrzymaniu ostatniego bębna, pokazujemy animacje wygranych (z lekkim opóźnieniem)
                 if (backendGrid.winLineWinData && backendGrid.winLineWinData.length > 0) {
-                    this.time.delayedCall(300, () => this.showWins(backendGrid.winLineWinData, backendGrid.grid));
+                    this.time.delayedCall(150, () => this.showWins(backendGrid.winLineWinData, backendGrid.grid));
                 }
             });
         });
