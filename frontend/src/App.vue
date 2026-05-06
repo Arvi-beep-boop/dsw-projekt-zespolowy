@@ -8,6 +8,7 @@ import LebronEgg from './components/LebronEgg.vue';
 import WinIndicator from './components/WinIndicator.vue';
 import { fetchInitialState, spinReelsAPI, reloadBalance } from './api/gameApi';
 import { EventBus } from './game/EventBus';
+import { getWinSoundKey } from './utils/audioHelpers';
 
 const SCALAR = 100;
 const balance = ref(0);
@@ -59,6 +60,7 @@ const handleSpin = async () => {
                 // Odblokowujemy przycisk "Spin" zaraz po zatrzymaniu bębnów (1100ms).
                 // Dzięki temu gracz może pominąć animację wygranej, jeśli chce grać szybciej.
                 const cooldownTime = (hasWin && !isLast) ? 3400 : 1200;
+
                 
                 if (result.numFreeSpinsAwarded > 0) {
                     if (!musicWasFaded) {
@@ -77,11 +79,11 @@ const handleSpin = async () => {
                     // --- 1. LOGIKA MUZYKI TŁA (SCATTER) ---
                     if (result.numFreeSpinsAwarded > 0) {
                         if (!musicWasFaded) {
-                            EventBus.emit('bg-music-fade-out', 1000);
+                            EventBus.emit('bg-music-fade-out', 300);
                             musicWasFaded = true; 
                         }
                         // Głośność scattera obniżona, by linie mogły się przebić przez tło
-                        EventBus.emit('play-audio', 'win-scatter', 0.5, myDelay);
+                        EventBus.emit('play-audio', 'win-scatter', 0.5, 0);
                     }
 
                     // --- 2. LOGIKA EFEKTÓW LINII WYGRYWAJĄCYCH ---
@@ -124,35 +126,6 @@ const handleSpin = async () => {
     }
 };
 
-const getWinSoundKey = (result) => {
-    if (!result.winLineWinData || result.winLineWinData.length === 0) {
-        return null;
-    }
-
-    let hasHigh = false;
-    let hasMedium = false;
-    let hasLow = false;
-
-    for (const line of result.winLineWinData) {
-        const symbolId = line.symbol; 
-        
-        if (symbolId === 1 || symbolId === 2 || symbolId === 9) {
-            hasHigh = true;
-        } 
-        else if (symbolId === 3 || symbolId === 4) {
-            hasMedium = true;
-        }
-        else if (symbolId === 5 || symbolId === 6 || symbolId === 7) {
-            hasLow = true;
-        }
-    }
-
-    if (hasHigh) return 'win-high';
-    if (hasMedium) return 'win-medium';
-    if (hasLow) return 'win-low';
-    
-    return null;
-};
 
 const handleReload = async () => {
     try {
