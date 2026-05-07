@@ -1,35 +1,35 @@
 export const AUDIO_SETTINGS = {
     volumes: {
-        reelsStop: 0.3,
+        reelsStop: 0.15,
         win: 0.9
     }
 };
 
 export const GAME_SETTINGS = {
     timings: {
-        // --- CHRONOLOGIA POJEDYNCZEGO SPINA ---
-        
-        // 1. Przerwa przed startem kolejnego spina (w trybie auto/free spins)
+        // --- 1. PRZYGOTOWANIE ---
+        // Odstęp przed startem kolejnego obrotu (w darmowych spinach / auto)
         autoSpinInterval: 600,        
-        
-        // 2. Czas pełnego "kręcenia się" bębnów zanim dostaną sygnał do hamowania
+
+        // --- 2. RUCH BĘBNÓW ---
+        // Jak długo bębny kręcą się w pełnym pędzie przed hamowaniem
         spinDurationBeforeStop: 600,   
-        
-        // 3. Czas hamowania bębnów (od uderzenia pierwszego do uderzenia trzeciego), proporcja ustawiona na sztywno w game.js dla sekundy - 0ms, 300ms, 700ms
+        // Czas od zatrzymania 1. bębna do zatrzymania 3. bębna
         reelsStopDuration: 1000,      
-        
-        // 4. Krótki "oddech" po zatrzymaniu całości na zobaczenie siatki, zanim wybuchną animacje
+
+        // --- 3. WYNIK I CELEBRACJA ---
+        // Pauza na "zobaczenie" symboli zaraz po zatrzymaniu bębnów
         showWinsDelay: 150,           
         
-        // 5a. Czas trwania animacji i podziwiania ZWYKŁEJ WYGRANEJ przed końcem tury
-        cooldownWin: 3400,            
-        
-        // 5b. Czas oczekiwania po PRZEGRANYM spinie przed zakończeniem tury
-        cooldownNormal: 1200,         
+        // Czas trwania efektów wizualnych (błyskawice, animacje postaci)
+        // Wyliczone idealnie: 31 klatek / 11.74 FPS = 2640ms
+        winAnimationDuration: 2640,   
 
-        // --- FREE SPINY / SCATTER ---
-        
-        // Czas trwania animacji napisu "X FREE SPINS" (powiększanie i znikanie)
+        // Czas blokady logiki gry podczas wygranej (zsynchronizowany z Phaserem)
+        cooldownWin: 2640,            
+
+        // --- DODATKI ---
+        // Czas trwania animacji napisu "X FREE SPINS"
         freeSpinsPopupTime: 2000      
     }
 };
