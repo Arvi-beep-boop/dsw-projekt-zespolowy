@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import Reel from '../components/Reel';
 import { SYMBOL_MAP, WIN_LINES } from '../../api/gameApi'; // Import słownika symbolów i linii wygrywających
-import { AUDIO_SETTINGS } from '../settings';
+import { AUDIO_SETTINGS, GAME_SETTINGS } from '../settings';
 
 export class Game extends Scene {
     constructor() {
@@ -52,6 +52,9 @@ export class Game extends Scene {
         gridGfx.strokePath();
         gridGfx.setDepth(100);
         
+        EventBus.on('show-free-spins-announcement', (numSpins) => {
+            this.showFreeSpinsPopup(numSpins);
+        });
 
         EventBus.on('play-audio', (key, volume = 1, delay = 0) => {
             const playLogic = () => {
@@ -130,31 +133,39 @@ export class Game extends Scene {
         
         EventBus.on('spin-stop', (backendGrid) => {
             const matrix = backendGrid.grid || backendGrid;
-            const vol = AUDIO_SETTINGS.volumes.reelsStop; // Pobieramy z settings.js ustawienia dzwieku dal efektu zatrzyamnia bębna
+            const vol = AUDIO_SETTINGS.volumes.reelsStop; 
+            const totalStopDuration = GAME_SETTINGS.timings.reelsStopDuration;
+            
+            // Zachowanie proporcji: 0 dla pierwszego, ~43% dla drugiego, 100% dla trzeciego
+            const delay1 = 0;
+            const delay2 = Math.round(totalStopDuration * 0.43); // 43% całego czasu
+            const delay3 = totalStopDuration;                   // 100% całego czasu
             
             const targetReel0 = [ matrix[0][0], matrix[1][0], matrix[2][0] ].map(id => SYMBOL_MAP[id]);
             const targetReel1 = [ matrix[0][1], matrix[1][1], matrix[2][1] ].map(id => SYMBOL_MAP[id]);
             const targetReel2 = [ matrix[0][2], matrix[1][2], matrix[2][2] ].map(id => SYMBOL_MAP[id]);
 
-            this.time.delayedCall(0, () => {
+            this.time.delayedCall(delay1, () => {
                 this.reels[0].stopSpin(targetReel0);
                 this.sound.play('reels-stop-1', { volume: vol }); 
             });
 
-            this.time.delayedCall(600, () => {
+            this.time.delayedCall(delay2, () => {
                 this.reels[1].stopSpin(targetReel1);
                 this.sound.play('reels-stop-2', { volume: vol }); 
             });
 
-            this.time.delayedCall(1400, () => {
+            this.time.delayedCall(delay3, () => {
                 this.reels[2].stopSpin(targetReel2, () => {
                     EventBus.emit('all-reels-stopped', backendGrid);
                 });
                 this.sound.play('reels-stop-3', { volume: vol });
                 
+                const postSpinDelay = GAME_SETTINGS.timings.showWinsDelay;
+
                 // Po zatrzymaniu ostatniego bębna, pokazujemy animacje wygranych (z lekkim opóźnieniem)
                 if (backendGrid.winLineWinData && backendGrid.winLineWinData.length > 0) {
-                    this.time.delayedCall(150, () => this.showWins(backendGrid.winLineWinData, backendGrid.grid));
+                    this.time.delayedCall(postSpinDelay, () => this.showWins(backendGrid.winLineWinData, backendGrid.grid));
                 }
             });
         });
@@ -262,6 +273,40 @@ export class Game extends Scene {
 
         this.time.delayedCall(4000, () => {
             this.clearWinAnimations();
+        });
+    }
+
+    showFreeSpinsPopup(numSpins) {
+        const x = this.scale.width / 2;
+        const y = this.scale.height / 2;
+        const totalTime = GAME_SETTINGS.timings.freeSpinsPopupTime;
+
+        const textObj = this.add.text(x, y, `${numSpins} FREE SPINS`, {
+            fontFamily: 'Arial',
+            fontSize: '80px',
+            fontStyle: 'bold',
+            color: '#FFD700',
+            stroke: '#000000',
+            strokeThickness: 10,
+            shadow: { offsetX: 4, offsetY: 4, color: '#000', blur: 4, stroke: true, fill: true }
+        });
+        
+        textObj.setOrigin(0.5);
+        textObj.setDepth(1000);
+        textObj.setScale(0); 
+        textObj.setAngle(-15);
+
+        this.tweens.add({
+            targets: textObj,
+            scale: 1.2,
+            angle: 15,
+            duration: totalTime / 2, // Połowa czasu na powiększenie
+            ease: 'Back.easeOut',
+            yoyo: true,              // Druga połowa na powrót (zmniejszenie)
+            onComplete: () => {
+                textObj.destroy();
+                EventBus.emit('free-spins-popup-finished');
+            }
         });
     }
 
