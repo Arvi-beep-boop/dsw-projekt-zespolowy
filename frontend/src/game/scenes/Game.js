@@ -281,31 +281,72 @@ export class Game extends Scene {
         const y = this.scale.height / 2;
         const totalTime = GAME_SETTINGS.timings.freeSpinsPopupTime;
 
-        const textObj = this.add.text(x, y, `${numSpins} FREE SPINS`, {
-            fontFamily: 'Arial',
-            fontSize: '80px',
+        const textStr = `${numSpins} FREE SPINS`;
+        const textObj = this.add.text(x, y, textStr, {
+            fontFamily: 'Arial, black',
+            fontSize: '60px',
             fontStyle: 'bold',
-            color: '#FFD700',
-            stroke: '#000000',
-            strokeThickness: 10,
-            shadow: { offsetX: 4, offsetY: 4, color: '#000', blur: 4, stroke: true, fill: true }
+            stroke: '#ffffff',
+            strokeThickness: 8
+        }).setOrigin(0.5).setDepth(1000).setScale(0);
+
+        // 1. Świecenie (Glow) - mocny żółty
+        textObj.setShadow(0, 0, '#ffff00', 30, false, true);
+
+        // 2. Tęcza przesuwająca się od lewej do prawej
+        const gradientProxy = { offset: 0 };
+        const rainbowTween = this.tweens.add({
+            targets: gradientProxy,
+            offset: 1,
+            duration: 500, 
+            repeat: -1,
+            onUpdate: () => {
+                const ctx = textObj.context;
+                const w = textObj.width || 400;
+                const gradient = ctx.createLinearGradient(0, 0, w, 0);
+                
+                const p1 = (0 + gradientProxy.offset) % 1;
+                const p2 = (0.33 + gradientProxy.offset) % 1;
+                const p3 = (0.66 + gradientProxy.offset) % 1;
+                
+                const stops = [
+                    { p: p1, c: '#ff0055' }, // Róż
+                    { p: p2, c: '#ffee00' }, // Żółć
+                    { p: p3, c: '#00eeff' }  // Cyjan (jasnoniebieski)
+                ].sort((a, b) => a.p - b.p);
+
+                gradient.addColorStop(stops[0].p, stops[0].c);
+                gradient.addColorStop(stops[1].p, stops[1].c);
+                gradient.addColorStop(stops[2].p, stops[2].c);
+                
+                textObj.setFill(gradient); // Pełne nasycenie, 0% przezroczystości
+            }
         });
-        
-        textObj.setOrigin(0.5);
-        textObj.setDepth(1000);
-        textObj.setScale(0); 
-        textObj.setAngle(-15);
+
+        // 3. Uderzenie w ekran ("w szybę"), pauza i zniknięcie
+        const popInTime = 400;
+        const popOutTime = 300;
+        const holdTime = totalTime - popInTime - popOutTime;
 
         this.tweens.add({
             targets: textObj,
-            scale: 1.2,
-            angle: 15,
-            duration: totalTime / 2, // Połowa czasu na powiększenie
-            ease: 'Back.easeOut',
-            yoyo: true,              // Druga połowa na powrót (zmniejszenie)
+            scale: 3.5, // Duży i wyraźny
+            ease: 'Back.out', 
+            duration: popInTime,
             onComplete: () => {
-                textObj.destroy();
-                EventBus.emit('free-spins-popup-finished');
+                this.time.delayedCall(holdTime, () => {
+                    this.tweens.add({
+                        targets: textObj,
+                        scale: 0,
+                        ease: 'Back.in', 
+                        duration: popOutTime,
+                        onComplete: () => {
+                            rainbowTween.stop();
+                            textObj.destroy();
+                            EventBus.emit('free-spins-popup-finished');
+                        }
+                    });
+                });
             }
         });
     }
