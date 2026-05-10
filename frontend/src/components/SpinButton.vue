@@ -36,7 +36,7 @@ watch(() => props.isSpinning, (newValue) => {
 }
 
 .spin-btn:disabled {
-    filter: grayscale(80%) brightness(0.7);
+    filter: grayscale(30%) brightness(0.8);
     cursor: not-allowed;
     transform: none;
 }
