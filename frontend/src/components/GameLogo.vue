@@ -22,7 +22,7 @@ const playLogoSound = () => {
   max-width: var(--logo-max-width); 
   z-index: 100;
   opacity: 0.9; 
-  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 1.5em var(--btn-gold-glow)) drop-shadow(0 0 1.5em var(--btn-gold-glow));
+  filter: drop-shadow(0 0 1.5em var(--btn-gold-glow));
   pointer-events: auto;
   cursor: pointer;
   transition: all 0.1s ease-in-out;

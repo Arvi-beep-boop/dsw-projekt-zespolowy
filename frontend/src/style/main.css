@@ -14,6 +14,19 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'OtakuRant';
+  src: url('../assets/fonts/OtakuRant.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OtakuRantBold';
+  src: url('../assets/fonts/OtakuRantBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
 :root {
   /* ZMIENNE UKŁADU I ODSTĘPÓW */
   --app-padding: 20px;
@@ -30,25 +43,27 @@
   --bg-app: #000000;
   --bg-machine: transparent;
   --bg-panel: transparent;
+  --bg-valueFrame: rgba(185, 233, 255, 0.185);
 
   /* PALETA GOLD INTERACTIVE (GUZIKI) */
-  --btn-gold-bg: #8a6e48;                 /* GŁÓWNY BRĄZOWO-ZŁOTY KOLOR WYPEŁNIENIA */
-  --btn-gold-hover: #a68558;              /* JAŚNIEJSZY ODCIEŃ PRZY NAJECHANIU MYSZKĄ */
-  --btn-gold-border: #c5b081;             /* CIENKA OSTRA RAMKA WOKÓŁ PRZYCISKU */
-  --btn-gold-border-hover: #e6d5b0;       /* EFEKT PODŚWIETLENIA KRAWĘDZI */
-  --btn-gold-shadow: #3d2f1b;             /* CIEMNY PASEK NA DOLE TWORZĄCY GRUBOŚĆ 3D */
-  --btn-gold-glow: rgba(197, 176, 129, 0.4); /* POŚWIATA EMITOWANA PRZY INTERAKCJI */
+  --btn-gold-bg: rgba(115, 169, 201, 0.473);                 /* GŁÓWNY BRĄZOWO-ZŁOTY KOLOR WYPEŁNIENIA */
+  --btn-gold-hover: rgba(108, 226, 255, 0.795);              /* JAŚNIEJSZY ODCIEŃ PRZY NAJECHANIU MYSZKĄ */
+  --btn-gold-border: rgb(234, 249, 255);             /* CIENKA OSTRA RAMKA WOKÓŁ PRZYCISKU */
+  --btn-gold-border-hover: #f7fdffc5;       /* EFEKT PODŚWIETLENIA KRAWĘDZI */
+  --btn-gold-shadow: #5b6f77a1;             /* CIEMNY PASEK NA DOLE TWORZĄCY GRUBOŚĆ 3D */
+  --btn-gold-glow: rgb(255, 255, 255); /* POŚWIATA EMITOWANA PRZY INTERAKCJI */
   
-  --btn-gold-text: #f3f2ec;               /* PODSTAWOWY KOLOR NAPISÓW */
-  --btn-gold-text-glow: rgba(243, 242, 236, 0.8); /* EFEKT JARZENIA SIĘ SAMEGO TEKSTU */
+  --btn-gold-text: #ffffff;               /* PODSTAWOWY KOLOR NAPISÓW */
+  --btn-gold-text-glow: #ffffff; /* EFEKT JARZENIA SIĘ SAMEGO TEKSTU */
   
   /* TYPOGRAFIA I TEKSTY */
-  --text-light: #eceae0;                  /* JASNY KOLOR DLA CYFR I WARTOŚCI */
-  --text-muted: #9c876a;                  /* STONOWANY KOLOR DLA ETYKIET (LABELI) */
-  --font-primary: 'SierraMadre', sans-serif;
+  --text-light: #ffffff;                  /* JASNY KOLOR DLA CYFR I WARTOŚCI */
+  --text-muted: #f3fbff;
+  --text-outline: rgb(176, 205, 230);                  /* STONOWANY KOLOR DLA ETYKIET (LABELI) */
+  --font-primary: 'OtakuRantBold', sans-serif;
 
   /* GOTOWE PACZKI ŚWIECENIA */
-  --glow-frame: 0 0 1.2em 0.5em var(--btn-gold-glow);
+  --glow-frame: 0 0 1.2em 0.1em var(--btn-gold-glow);
   --glow-text: 0 0 0.6em var(--btn-gold-text-glow);
 }
 

@@ -1,98 +1,28 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import GameLogo from './components/GameLogo.vue';
 import GameDisplay from './components/GameDisplay.vue';
 import ControlPanel from './components/ControlPanel.vue';
 import CoinFountain from './components/CoinFountain.vue';
 import LebronEgg from './components/LebronEgg.vue';
 import WinIndicator from './components/WinIndicator.vue';
-import { fetchInitialState, spinReelsAPI, reloadBalance } from './api/gameApi';
-import { EventBus } from './game/EventBus';
+import { useSlotMachine } from './composables/useSlotMachine';
 
-const SCALAR = 100;
-const balance = ref(0);
-const win = ref(0);
-const currentBet = ref(1);
-const availableBets = ref([1, 2, 3, 4])
-const isSpinning = ref(false);
+const { 
+    balance, 
+    win, 
+    currentBet, 
+    availableBets, 
+    isSpinning, 
+    handleBetChange, 
+    handleSpin, 
+    handleReload,
+    loadInitialState 
+} = useSlotMachine();
 
-const handleBetChange = (newAmount) => {
-    currentBet.value = newAmount;
-};
-
-onMounted(async () => {
-    const initState = await fetchInitialState();
-    if (initState) {
-        balance.value = initState.newBalance / SCALAR;
-    }
+onMounted(() => {
+    loadInitialState();
 });
-
-const handleSpin = async () => {
-    if (isSpinning.value) return
-    isSpinning.value = true;
-    const backendBet = currentBet.value * SCALAR;
-
-    try {
-        const response = await spinReelsAPI(backendBet);
-
-        if (response && response.gameResult && response.gameResult.length > 0) {
-            balance.value = response.newBalance / SCALAR;
-            win.value = 0;
-            
-            for (let i = 0; i < response.gameResult.length; i++) {
-                const result = response.gameResult[i];
-                
-                if (i > 0) {
-                    EventBus.emit('spin-start');
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                } else {
-                    EventBus.emit('spin-start');
-                }
-                
-                EventBus.emit('spin-stop', result);
-                win.value = result.cumulativeWinMoney / SCALAR;
-                
-                const hasWin = result.winLineWinData && result.winLineWinData.length > 0;
-                const isLast = i === response.gameResult.length - 1;
-                // Odblokowujemy przycisk "Spin" zaraz po zatrzymaniu bębnów (1100ms).
-                // Dzięki temu gracz może pominąć animację wygranej, jeśli chce grać szybciej.
-                const cooldownTime = (hasWin && !isLast) ? 3400 : 1100;
-                
-                if (hasWin) {
-                    setTimeout(() => {
-                        // Odpal fontannę tylko jeśli gracz nie kliknął już kolejnego spina
-                        if (!isSpinning.value || !isLast) {
-                            EventBus.emit('trigger-fountain');
-                        }
-                    }, 1300);
-                }
-                
-                await new Promise(resolve => setTimeout(resolve, cooldownTime));
-            }
-        }
-        
-        isSpinning.value = false;
-        
-    } catch (error) {
-        console.error(error.message);
-        alert("Spin odrzucony: Sprawdź saldo lub stawkę.");
-        isSpinning.value = false;
-    }
-};
-
-const handleReload = async () => {
-    try {
-        await reloadBalance();
-        const freshState = await fetchInitialState();
-        
-        if (freshState && freshState.newBalance !== undefined) {
-            balance.value = freshState.newBalance / SCALAR;
-            win.value = 0;
-        }
-    } catch (error) {
-        console.error("Wystąpił błąd:", error);
-    }
-}  
 </script>
 
 <template>

@@ -1,8 +1,17 @@
 <script setup>
-defineProps({
+import { watch } from 'vue';
+import { EventBus } from '../game/EventBus';
+const props = defineProps({
     isSpinning: Boolean,
 })
 defineEmits(['spin']);
+watch(() => props.isSpinning, (newValue) => {
+    if (newValue === true) {
+        EventBus.emit('play-audio', 'btn-press', 1, 0);
+    } else {
+        EventBus.emit('play-audio', 'btn-release', 1,  0);
+    }
+});
 </script>
 
 <template>
@@ -27,7 +36,7 @@ defineEmits(['spin']);
 }
 
 .spin-btn:disabled {
-    filter: grayscale(80%) brightness(0.7);
+    filter: grayscale(30%) brightness(0.8);
     cursor: not-allowed;
     transform: none;
 }

@@ -43,11 +43,16 @@ defineProps(['label', 'value', 'unit']);
 .stat-label { 
   font-family: var(--font-primary);
   font-size: 2.5em; 
-  color: var(--text-muted); /* Zmienna z main.css */
+  color: var(--text-muted);
+
   text-transform: uppercase; 
   font-weight: bold;
   letter-spacing: 0.05em;
   margin-bottom: 0.7em;
+
+  -webkit-text-stroke: 2px var(--text-outline);
+  
+  
 }
 
 /* --- RAMKA Z WARTOŚCIĄ --- */
@@ -62,15 +67,16 @@ defineProps(['label', 'value', 'unit']);
   
   font-size: 1.8em;
   font-weight: bold;
-  background-color: rgba(15, 15, 15, 0.85); 
+  background-color: var(--bg-valueFrame); 
   border: 0.15em solid var(--btn-gold-border); 
   border-radius: 0.8em; 
   color: var(--text-light); 
   
+  
   box-shadow: 
-    inset 0 0 0.8em rgba(0, 0, 0, 0.9), 
-    0 0.3em 0.5em rgba(0, 0, 0, 0.4);
-  text-shadow: 0 0 0.5em var(--btn-gold-text-glow);
+    inset 0 0 0.8em rgba(0, 0, 0, 0.158), 
+    0 0.3em 0.5em rgba(255, 255, 255, 0.459);
+  text-shadow: var(--glow-text);
   
 }
 </style>
