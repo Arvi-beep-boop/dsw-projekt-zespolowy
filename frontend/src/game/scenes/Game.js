@@ -6,17 +6,27 @@ import { AUDIO_SETTINGS, GAME_SETTINGS } from '../settings';
 
 export class Game extends Scene {
     constructor() {
+        // Tworzy główną scenę gry o nazwie 'Game'
         super('Game');
+        
+        // Tablica przechowująca obiekty bębnów
         this.reels = [];
+        
+        // Przechowuje aktywne animacje wygranych, żeby łatwo je było usunąć przy kolejnym spinie
         this.activeWinAnimations = [];
     }
 
+    // ====================================================
+    // 1. INICJALIZACJA SCENY
+    // ====================================================
     create ()
     {
         const w = this.scale.width;
         const h = this.scale.height;
         this.cameras.main.setBackgroundColor(0x222222);
 
+        // --- Inicjalizacja muzyki z tła ---
+        // Sprawdza czy muzyka już gra, żeby jej nie dublować przy restarcie sceny
         if (!this.sound.get('bg-music')) {
             this.bgMusic = this.sound.add('bg-music', { 
                 loop: true,
@@ -25,10 +35,13 @@ export class Game extends Scene {
             this.bgMusic.play();
         }
         
+        // --- Konfiguracja pasków symboli (Strips) ---
+        // Wzorce symboli na bębnach
         const stripPattern1 = ['H1', 'L1', 'M2', 'WILD', 'L2', 'SCATTER', 'H2', 'L3', 'M1'];
         const stripPattern2 = ['L3', 'WILD', 'H1', 'M1', 'SCATTER', 'L1', 'H2', 'L2', 'M2'];
         const stripPattern3 = ['M2', 'L2', 'H2', 'SCATTER', 'L1', 'WILD', 'M1', 'L3', 'H1'];
 
+        // Powiela te wzorce, tworząc długie paski, co pozwala na dłuższą animację kręcenia
         const reelStrip1 = Array.from({ length: 89 }, (_, i) => stripPattern1[i % stripPattern1.length]);
         const reelStrip2 = Array.from({ length: 89 }, (_, i) => stripPattern2[i % stripPattern2.length]);
         const reelStrip3 = Array.from({ length: 89 }, (_, i) => stripPattern3[i % stripPattern3.length]);
@@ -36,11 +49,14 @@ export class Game extends Scene {
         const colW = Math.ceil(w / 3);
         const rowH = Math.ceil(h / 3);
 
-        const reel1 = new Reel(this, 0, 0, reelStrip1, colW, rowH);
-        const reel2 = new Reel(this, colW, 0, reelStrip2, colW, rowH);
-        const reel3 = new Reel(this, colW * 2, 0, reelStrip3, colW, rowH);
-        this.reels = [reel1, reel2, reel3];
+        // --- Tworzenie bębnów ---
+        this.reel1 = new Reel(this, 0, 0, reelStrip1, colW, rowH);
+        this.reel2 = new Reel(this, colW, 0, reelStrip2, colW, rowH);
+        this.reel3 = new Reel(this, colW * 2, 0, reelStrip3, colW, rowH);
+        this.reels = [this.reel1, this.reel2, this.reel3];
         
+        // --- Rysowanie siatki (Grid) ---
+        // Oddziela symbole wizualnymi liniami
         const gridGfx = this.add.graphics();
         gridGfx.lineStyle(4, 0xc5b081, 0.4);
         gridGfx.beginPath();
@@ -49,15 +65,21 @@ export class Game extends Scene {
         gridGfx.moveTo(0, rowH); gridGfx.lineTo(w, rowH);
         gridGfx.moveTo(0, rowH * 2); gridGfx.lineTo(w, rowH * 2);
         gridGfx.strokePath();
-        gridGfx.setDepth(100);
+        gridGfx.setDepth(100); 
         
+        // ====================================================
+        // 2. OBSŁUGA ZDARZEŃ (EVENT BUS)
+        // Łącznik między interfejsem Vue a silnikiem gry Phaser
+        // ====================================================
+        
+        // Wyświetla popup z informacją o darmowych spinach
         EventBus.on('show-free-spins-announcement', (numSpins) => {
             this.showFreeSpinsPopup(numSpins);
         });
 
-        // --- ZWYKŁE AUDIO ---
+        // --- Standardowe efekty dźwiękowe ---
         EventBus.on('play-audio', (key, volume = 1, delay = 0) => {
-            // TARCZA 1: Blokujemy próby odpalenia scattera jako zwykłego dźwięku (żeby nie było echa)
+            // Ignoruje główny dźwięk scattera, ponieważ on ma swoją własną logikę odtwarzania poniżej
             if (key === 'win-scatter') return; 
 
             const playLogic = () => this.sound.play(key, { volume: volume });
@@ -65,6 +87,7 @@ export class Game extends Scene {
             else playLogic();
         });
 
+        // Płynne wyciszanie określonych dźwięków
         EventBus.on('stop-audio', (key, duration = 1000) => {
             const sounds = this.sound.getAll(key);
             sounds.forEach(sound => {
@@ -77,8 +100,9 @@ export class Game extends Scene {
             });
         });
 
-       // --- CROSSFADE (SCATTER <-> TŁO) ---
-        // Wyciszanie tła przed czasem
+        // --- Crossfade (Przełączanie muzyki tła na Scatter i odwrotnie) ---
+        
+        // Wcześniejsze wyciszenie muzyki z tła (odpalane zanim bębny się zatrzymają)
         EventBus.on('pre-fade-bg', () => {
             if (this.bgMusic) {
                 this.tweens.add({
@@ -89,7 +113,7 @@ export class Game extends Scene {
             }
         });
 
-        // Sam cios Scattera
+        // Odtwarza główny dźwięk trafienia scattera
         EventBus.on('play-scatter-sound', () => {
             if (!this.scatterMusic || !this.scatterMusic.isPlaying) {
                 if (this.scatterMusic) this.scatterMusic.destroy();
@@ -100,12 +124,12 @@ export class Game extends Scene {
             }
         });
 
+        // Powrót do muzyki z tła po zakończeniu darmowych spinów
         EventBus.on('crossfade-to-bg', () => {
             if (this.scatterMusic && this.scatterMusic.isPlaying) {
                 this.tweens.add({
                     targets: this.scatterMusic,
                     volume: 0,
-                    // Ciągnie czas wyciszania scattera z settings.js (domyślnie 750)
                     duration: AUDIO_SETTINGS.fades.scatterFadeOut || 750,
                     onComplete: () => {
                         this.scatterMusic.stop(); 
@@ -119,17 +143,19 @@ export class Game extends Scene {
                 this.tweens.add({
                     targets: this.bgMusic,
                     volume: AUDIO_SETTINGS.volumes.bgMusic || 0.1,
-                    // Ciągnie czas powrotu tła z settings.js (domyślnie 750)
                     duration: AUDIO_SETTINGS.fades.bgMusicFadeIn || 750 
                 });
             }
         });
 
-        // --- CZYSZCZENIE ANIMACJI ---
+        // --- Logika obrotów maszyny (Spiny) ---
+
+        // Czyści animacje z ekranu np. po wciśnięciu szybkiego spina
         EventBus.on('clear-win-animations', () => {
             this.clearWinAnimations();
         });
 
+        // Startuje fizyczny obrót dla wszystkich bębnów
         EventBus.on('spin-start', () => {
             this.clearWinAnimations();
             this.sound.play('reels-spin-1600', { volume: AUDIO_SETTINGS.volumes.reelsSpin });
@@ -139,15 +165,18 @@ export class Game extends Scene {
             });
         });
         
+        // Obsługa wyniku z serwera i zatrzymywanie bębnów na wyznaczonych miejscach
         EventBus.on('spin-stop', (backendGrid) => {
             const matrix = backendGrid.grid || backendGrid;
             const vol = AUDIO_SETTINGS.volumes.reelsStop; 
             const totalStopDuration = GAME_SETTINGS.timings.reelsStopDuration;
             
+            // Opóźnienia dla efektu zatrzymywania jeden po drugim (bęben 1 -> 2 -> 3)
             const delay1 = 0;
             const delay2 = Math.round(totalStopDuration * 0.43); 
             const delay3 = totalStopDuration;                  
             
+            // Mapuje ID symboli z backendu na nazwy używane w silniku gry
             const targetReel0 = [ matrix[0][0], matrix[1][0], matrix[2][0] ].map(id => SYMBOL_MAP[id]);
             const targetReel1 = [ matrix[0][1], matrix[1][1], matrix[2][1] ].map(id => SYMBOL_MAP[id]);
             const targetReel2 = [ matrix[0][2], matrix[1][2], matrix[2][2] ].map(id => SYMBOL_MAP[id]);
@@ -163,6 +192,7 @@ export class Game extends Scene {
             });
 
             this.time.delayedCall(delay3, () => {
+                // Informuje główną logikę w Vue, że wszystkie bębny już stoją
                 this.reels[2].stopSpin(targetReel2, () => {
                     EventBus.emit('all-reels-stopped', backendGrid);
                 });
@@ -170,6 +200,7 @@ export class Game extends Scene {
                 
                 const postSpinDelay = GAME_SETTINGS.timings.showWinsDelay;
 
+                // Odpala animacje trafionych linii po krótkim opóźnieniu
                 if (backendGrid.winLineWinData && backendGrid.winLineWinData.length > 0) {
                     this.time.delayedCall(postSpinDelay, () => this.showWins(backendGrid.winLineWinData, backendGrid.grid));
                 }
@@ -180,6 +211,7 @@ export class Game extends Scene {
             this.showLebronFlash();
         });
 
+        // Obsługa zdarzeń dla licznika darmowych spinów
         EventBus.on('fs-counter-create', (count) => this.createFreeSpinCounter(count));
         EventBus.on('fs-counter-update', (count) => this.updateFreeSpinCounter(count));
         EventBus.on('fs-counter-destroy', () => this.destroyFreeSpinCounter());
@@ -187,6 +219,11 @@ export class Game extends Scene {
         EventBus.emit('current-scene-ready', this);
     }
     
+    // ====================================================
+    // 3. WIZUALIZACJA WYGRANYCH I ANIMACJE
+    // ====================================================
+    
+    // Usuwa wszystkie animacje wygranych z ekranu
     clearWinAnimations() {
         this.activeWinAnimations.forEach(anim => {
             if (anim) anim.destroy();
@@ -195,6 +232,7 @@ export class Game extends Scene {
         EventBus.emit('win-lines-clear');
     }
 
+    // Rysuje podświetlenia i animacje na wygrywających symbolach
     showWins(winLineWinData, grid) {
         if (!winLineWinData || winLineWinData.length === 0) return;
         if (this.reels.some(r => r.isSpinning)) return; 
@@ -206,6 +244,7 @@ export class Game extends Scene {
 
         const winningRows = new Set();
 
+        // Ustala czas trwania animacji. Specjalne symbole (np. Lebron, Moneta) wyświetlają się dłużej.
         let isLongAnimation = false;
         winLineWinData.forEach(winData => {
             const symbolKey = SYMBOL_MAP[winData.symbol]?.toUpperCase();
@@ -216,6 +255,7 @@ export class Game extends Scene {
 
         const animDuration = isLongAnimation ? (GAME_SETTINGS.timings?.winAnimationDuration || 2640) : 1280;
 
+        // Przechodzi przez wszystkie wygrywające linie otrzymane z backendu
         winLineWinData.forEach(winData => {
             const lineCoords = WIN_LINES[winData.winLineId];
             if (!lineCoords) return;
@@ -228,14 +268,14 @@ export class Game extends Scene {
             const animKey = `${symbolKey}-win-anim`;
             const frameKey = `${symbolKey}-win-frame-1`;
 
-            if (!this.anims.exists(animKey)) {
-                return;
-            }
+            if (!this.anims.exists(animKey)) return;
 
+            // Nakłada animację i błysk świetlny na konkretne pole na siatce
             for (let i = 0; i < lineCoords.length; i++) {
                 const coord = lineCoords[i];
                 if (!coord) continue;
 
+                // Liczy dokładną pozycję (X, Y) na ekranie
                 const posX = (coord.col * colW) + (colW / 2);
                 const posY = (coord.row * rowH) + (rowH / 2);
 
@@ -246,6 +286,7 @@ export class Game extends Scene {
                 animSprite.play(animKey);
                 this.activeWinAnimations.push(animSprite);
 
+                // Nakłada dodatkowy błysk podbijający kolory z użyciem trybu ADD
                 const flashSprite = this.add.sprite(posX, posY, 'flash-frame-1');
                 flashSprite.setDepth(210);
                 flashSprite.setDisplaySize(colW, rowH);
@@ -259,11 +300,13 @@ export class Game extends Scene {
 
         EventBus.emit('win-lines-active', [...winningRows]);
 
+        // Automatycznie usuwa te animacje po upływie wyznaczonego czasu
         this.time.delayedCall(animDuration, () => {
             this.clearWinAnimations();
         });
     }
 
+    // Podświetla całą maszynę naraz (używane do akcji specjalnych)
     showLebronFlash() {
         const w = this.scale.width;
         const h = this.scale.height;
@@ -290,6 +333,11 @@ export class Game extends Scene {
         });
     }
 
+    // ====================================================
+    // 4. ELEMENTY INTERFEJSU (UI) NA EKRANIE
+    // ====================================================
+
+    // Główny napis na środku ekranu pojawiający się przed startem darmowych spinów
     showFreeSpinsPopup(numSpins) {
         const x = this.scale.width / 2;
         const y = this.scale.height / 2;
@@ -309,6 +357,7 @@ export class Game extends Scene {
 
         textObj.setShadow(0, 0, '#ffff00', 30, false, true);
 
+        // Tworzy efekt płynącego gradientu na czcionce (aktualizuje teksturę co klatkę)
         const gradientProxy = { offset: 0 };
         const rainbowTween = this.tweens.add({
             targets: gradientProxy,
@@ -316,7 +365,7 @@ export class Game extends Scene {
             duration: 500, 
             repeat: -1,
             onUpdate: () => {
-                if (!textObj || !textObj.active) return; // Zapobieganie błędom drawImage
+                if (!textObj || !textObj.active) return; 
                 
                 const ctx = textObj.context;
                 const w = textObj.width || 400;
@@ -340,6 +389,7 @@ export class Game extends Scene {
             }
         });
 
+        // Lekkie "chybotanie" tekstu na boki dla dynamiki
         textObj.setAngle(-8);
         const wobbleTween = this.tweens.add({
             targets: textObj,
@@ -350,6 +400,7 @@ export class Game extends Scene {
             ease: 'Sine.easeInOut'
         });
 
+        // Dzieli całkowity czas na wjazd tekstu, pokazanie go i zjazd
         const thirdTime = Math.round(totalTime / 3);
         const popInTime = thirdTime;
         const holdTime = thirdTime;
@@ -379,6 +430,7 @@ export class Game extends Scene {
         });
     }
 
+    // Tworzy z boku ekranu mały okrągły licznik pokazujący ile zostało darmowych rzutów
     createFreeSpinCounter(initialCount) {
         if (this.fsCounterGroup) this.fsCounterGroup.destroy(true);
 
@@ -390,6 +442,7 @@ export class Game extends Scene {
         this.fsCounterGroup = this.add.container(x, y);
         this.fsCounterGroup.setDepth(500);
 
+        // Generuje tęczowe tło licznika (tylko w pamięci, by nie musieć wgrywać osobnego obrazka)
         if (!this.textures.exists('fs-rainbow-bg')) {
             const canvas = document.createElement('canvas');
             canvas.width = 100; canvas.height = 100;
@@ -415,6 +468,7 @@ export class Game extends Scene {
             repeat: -1
         });
 
+        // Generuje neonową, kolorową "aurę" dookoła licznika
         if (!this.textures.exists('fs-smooth-aura')) {
             const canvas = document.createElement('canvas');
             canvas.width = 140; canvas.height = 140; 
@@ -459,6 +513,7 @@ export class Game extends Scene {
         this.fsText.setShadow(0, 0, '#ffffff', 5, false, true); 
         this.fsCounterGroup.add(this.fsText);
 
+        // Płynna zmiana koloru samej cyferki z użyciem formatu HSL
         const colorProxy = { hue: 0 };
         this.tweens.add({
             targets: colorProxy,
@@ -466,7 +521,7 @@ export class Game extends Scene {
             duration: 4000, 
             repeat: -1,
             onUpdate: () => {
-                if (!this.fsText || !this.fsText.active) return; // Zapobieganie błędom drawImage
+                if (!this.fsText || !this.fsText.active) return; 
                 
                 const ctx = this.fsText.context;
                 const gradient = ctx.createLinearGradient(-25, -25, 25, 25);
@@ -499,6 +554,7 @@ export class Game extends Scene {
         });
     }
 
+    // Odświeża liczbę darmowych spinów i podbija jej rozmiar dla ładniejszego efektu kliknięcia
     updateFreeSpinCounter(count) {
         if (!this.fsText) return;
         this.fsText.setText(count);
@@ -512,6 +568,7 @@ export class Game extends Scene {
         });
     }
 
+    // Chowa licznik po wykorzystaniu wszystkich spinów i czyści po nim pamięć
     destroyFreeSpinCounter() {
         if (this.fsCounterGroup) {
             this.tweens.add({
@@ -527,7 +584,12 @@ export class Game extends Scene {
         }
     }
 
+    // ====================================================
+    // 5. GŁÓWNA PĘTLA GRY
+    // ====================================================
     update() {
+        // Wywoływane co klatkę (standardowo ok. 60 razy na sekundę). 
+        // Puszcza dalej aktualizację fizyki i pozycjonowania bębnów.
         this.reels.forEach(reel => reel.updateReel());
     }
 

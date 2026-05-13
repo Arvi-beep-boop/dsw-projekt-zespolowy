@@ -1,51 +1,65 @@
 export const AUDIO_SETTINGS = {
     volumes: {
-        bgMusic: 0.5,           // Muzyka w tle
-        reelsSpin: 0.4,         // Dźwięk kręcących się bębnów
-        reelsStop: 0.15,        // Uderzenie bębna przy zatrzymaniu
-        win: 0.9,               // Zwykłe wygrane z linii (postacie itp.)
-        scatterPopup: 0.5,      // Dźwięk wyskakiwania napisu FREE SPINS i muzyka
+        // Globalna głośność ścieżki dźwiękowej odtwarzanej w tle
+        bgMusic: 0.5,           
+        // Głośność mechanicznego dźwięku obracających się bębnów
+        reelsSpin: 0.4,         
+        // Głośność akcentu dźwiękowego odtwarzanego w momencie zatrzymania pojedynczego bębna
+        reelsStop: 0.15,        
+        // Poziom głośności standardowych efektów dźwiękowych przy wygranej z linii
+        win: 0.9,               
+        // Głośność powiadomienia tekstowego oraz głównego motywu dźwiękowego trybu darmowych gier
+        scatterPopup: 0.5,      
+        // Poziom głośności efektu wypłacania monet podczas transferu do salda głównego
         coinFountain: 0.7
     },
     fades: {
-        bgMusicFadeOut: 1000,   // Czas wyciszania muzyki tła przy scatterze
-        bgMusicFadeIn: 500,     // Czas przywracania muzyki tła
+        // Czas (ms) zanikania muzyki z tła podczas aktywacji darmowych gier
+        bgMusicFadeOut: 1000,   
+        // Czas (ms) powrotu muzyki z tła po zakończeniu trybu darmowych gier
+        bgMusicFadeIn: 500,     
+        // Czas (ms) wygaszania motywu darmowych gier przy powrocie do standardowego widoku maszyny
         scatterFadeOut: 1400,
-        preFadeTime: 1000       // Czas wyciszania muzyki background przed wylosowaniem ostatniego bębna scattera, w celu uzyskania totalnej ciszy na wejście scattera
+        // Wyprzedzenie (ms), z jakim muzyka tła zacznie cichnąć przed zatrzymaniem ostatniego bębna, 
+        // zaprojektowane w celu uzyskania ciszy potęgującej uderzenie dźwięku Scattera
+        preFadeTime: 1000       
     }
-    
 };
 
 export const GAME_SETTINGS = {
     timings: {
-        // --- 1. RUCH BĘBNÓW ---
-        // Jak długo bębny kręcą się w pełnym pędzie przed hamowaniem
+        // --- 1. MECHANIKA BĘBNÓW ---
+        // Gwarantowany czas (ms) pełnego obrotu bębnów przed zainicjowaniem sekwencji hamowania
         spinDurationBeforeStop: 600,   
-        // Czas od zatrzymania 1. bębna do zatrzymania 3. bębna
+        // Całkowity czas (ms) przewidziany na sekwencyjne zatrzymanie wszystkich bębnów (od pierwszego do ostatniego)
         reelsStopDuration: 1000,      
 
-        // --- 2. WYNIK ---
-        // Pauza na "zobaczenie" symboli zaraz po zatrzymaniu bębnów
+        // --- 2. PREZENTACJA WYNIKÓW ---
+        // Okno czasowe (ms) pomiędzy pełnym zatrzymaniem układu a rozpoczęciem animacji i dźwięków wygranych
         showWinsDelay: 150,           
         
-        // Czas trwania efektów wizualnych (błyskawice, animacje postaci)
-        // Wyliczone: max 31 klatek / 11.74 FPS = 2640ms
+        // Wymuszony czas (ms) wyświetlania rozszerzonych animacji specjalnych (np. symbole Lebron, Moneta). 
+        // Wyliczone dla pełnego cyklu klatek.
         winAnimationDuration: 2640,   
 
-        // Czas blokady logiki gry podczas wygranej (zsynchronizowany z Phaserem)
+        // Blokada czasowa (ms) wstrzymująca logikę maszyny przed kolejnym spinem, 
+        // synchronizująca interfejs logiki z cyklem życia animacji w silniku Phaser
         cooldownWin: 2640,            
 
-        // --- DODATKI ---
-        // Czas trwania animacji napisu "X FREE SPINS"
-        // 1/3 czasu wpada, 1/3 stoi, 1/3 ucieka
+        // --- 3. ELEMENTY INTERFEJSU ---
+        // Całkowity czas (ms) ekspozycji powiadomienia o darmowych spinach 
+        // (zautomatyzowany podział na fazy: animacja wejścia, utrzymanie, animacja wyjścia)
         freeSpinsPopupTime: 1600 
     },
     hud: {
-        fsCounterMarginBottom: 80, // Dystans licznika scattera od dolnej krawędzi okna Phasera
-        fsCounterMarginRight: 80 // Dystans licznika scattera od prawej krawędzi okna Phasera
+        // Margines dolny (px) do pozycjonowania licznika darmowych spinów w przestrzeni Canvas
+        fsCounterMarginBottom: 80, 
+        // Margines prawy (px) do pozycjonowania licznika darmowych spinów w przestrzeni Canvas
+        fsCounterMarginRight: 80 
     },
     dev: {
-        mockScatterFirstSpin: false // Zmień na false, gdy będziesz grał normalnie
+        // Flaga nadpisująca zapytanie do API testowym obiektem JSON przy pierwszym spinie.
+        // Ułatwia testowanie trybu Scatter bez konieczności czekania na fizyczne wylosowanie go z serwera.
+        mockScatterFirstSpin: false 
     },
-
-}; 
+};
