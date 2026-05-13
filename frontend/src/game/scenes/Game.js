@@ -1,7 +1,7 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import Reel from '../components/Reel';
-import { SYMBOL_MAP, WIN_LINES } from '../../api/gameApi'; // Import słownika symbolów i linii wygrywających
+import { SYMBOL_MAP, WIN_LINES } from '../../api/gameApi'; 
 import { AUDIO_SETTINGS, GAME_SETTINGS } from '../settings';
 
 export class Game extends Scene {
@@ -20,11 +20,10 @@ export class Game extends Scene {
         if (!this.sound.get('bg-music')) {
             this.bgMusic = this.sound.add('bg-music', { 
                 loop: true,
-                volume: AUDIO_SETTINGS.volumes.bgMusic
+                volume: AUDIO_SETTINGS.volumes.bgMusic || 0.1
             });
             this.bgMusic.play();
         }
-
         
         const stripPattern1 = ['H1', 'L1', 'M2', 'WILD', 'L2', 'SCATTER', 'H2', 'L3', 'M1'];
         const stripPattern2 = ['L3', 'WILD', 'H1', 'M1', 'SCATTER', 'L1', 'H2', 'L2', 'M2'];
@@ -56,79 +55,88 @@ export class Game extends Scene {
             this.showFreeSpinsPopup(numSpins);
         });
 
+        // --- ZWYKŁE AUDIO ---
         EventBus.on('play-audio', (key, volume = 1, delay = 0) => {
-            const playLogic = () => {
-                // --- BLOKADA DUBLOWANIA SCATTERA ---
-                if (key === 'win-scatter') {
-                    // Pobieramy WSZYSTKIE instancje tego dźwięku
-                    const existingSounds = this.sound.getAll('win-scatter');
-                    // Sprawdzamy czy którakolwiek z nich aktualnie gra
-                    if (existingSounds.some(s => s.isPlaying)) return;
-                }
+            // TARCZA 1: Blokujemy próby odpalenia scattera jako zwykłego dźwięku (żeby nie było echa)
+            if (key === 'win-scatter') return; 
 
-                this.sound.play(key, { volume: volume });
-            };
-
-            if (delay > 0) {
-                this.time.delayedCall(delay, playLogic);
-            } else {
-                playLogic();
-            }
+            const playLogic = () => this.sound.play(key, { volume: volume });
+            if (delay > 0) this.time.delayedCall(delay, playLogic);
+            else playLogic();
         });
 
-        // wyłączenie scattera
         EventBus.on('stop-audio', (key, duration = 1000) => {
-            // Zmieniamy get na getAll, żeby wyłapać wszystkie instancje
             const sounds = this.sound.getAll(key);
-            
             sounds.forEach(sound => {
                 if (sound && sound.isPlaying) {
                     this.tweens.add({
-                        targets: sound,
-                        volume: 0,
-                        duration: duration,
-                        onComplete: () => {
-                            sound.stop();
-                            sound.destroy(); // usuwa użyty dźwięk z pamięci
-                        }
+                        targets: sound, volume: 0, duration: duration,
+                        onComplete: () => { sound.stop(); sound.destroy(); }
                     });
-                } else if (sound) {
-                    // Jeśli jakiś stary dźwięk "wisi" zatrzymany, od razu go czyścimy
-                    sound.destroy(); 
-                }
+                } else if (sound) sound.destroy();
             });
         });
 
-        EventBus.on('bg-music-fade-out', (duration = 300) => {
+       // --- CROSSFADE (SCATTER <-> TŁO) ---
+        // Wyciszanie tła przed czasem
+        EventBus.on('pre-fade-bg', () => {
             if (this.bgMusic) {
-                // Tween płynnie zmienia głośność od obecnej do 0 w określonym czasie
                 this.tweens.add({
                     targets: this.bgMusic,
                     volume: 0,
-                    duration: duration
+                    duration: AUDIO_SETTINGS.fades?.bgMusicFadeOut || 1000 
                 });
             }
         });
 
-        
+        // Sam cios Scattera
+        EventBus.on('play-scatter-sound', () => {
+            if (!this.scatterMusic || !this.scatterMusic.isPlaying) {
+                if (this.scatterMusic) this.scatterMusic.destroy();
+                this.scatterMusic = this.sound.add('win-scatter', { 
+                    volume: AUDIO_SETTINGS.volumes?.scatterPopup || 0.5 
+                }); 
+                this.scatterMusic.play();
+            }
+        });
 
-        // Płynne podgłośnienie muzyki w tle (fade in)
-        EventBus.on('bg-music-fade-in', (duration = 300, targetVolume = 0.5) => {
+        EventBus.on('crossfade-to-bg', () => {
+            if (this.scatterMusic && this.scatterMusic.isPlaying) {
+                this.tweens.add({
+                    targets: this.scatterMusic,
+                    volume: 0,
+                    // Ciągnie czas wyciszania scattera z settings.js (domyślnie 750)
+                    duration: AUDIO_SETTINGS.fades.scatterFadeOut || 750,
+                    onComplete: () => {
+                        this.scatterMusic.stop(); 
+                        this.scatterMusic.destroy();
+                        this.scatterMusic = null;
+                    }
+                });
+            }
+
             if (this.bgMusic) {
                 this.tweens.add({
                     targets: this.bgMusic,
-                    volume: targetVolume,
-                    duration: duration
+                    volume: AUDIO_SETTINGS.volumes.bgMusic || 0.1,
+                    // Ciągnie czas powrotu tła z settings.js (domyślnie 750)
+                    duration: AUDIO_SETTINGS.fades.bgMusicFadeIn || 750 
                 });
             }
         });
 
+        // --- CZYSZCZENIE ANIMACJI ---
+        EventBus.on('clear-win-animations', () => {
+            this.clearWinAnimations();
+        });
+
         EventBus.on('spin-start', () => {
-            if (this.reels.some(r => r.isSpinning)) return;
-            // Czyszczenie animacji po poprzednim spinie
             this.clearWinAnimations();
             this.sound.play('reels-spin-1600', { volume: AUDIO_SETTINGS.volumes.reelsSpin });
-            this.reels.forEach(reel => reel.startSpin());
+            this.reels.forEach(reel => {
+                reel.isSpinning = false; 
+                reel.startSpin();
+            });
         });
         
         EventBus.on('spin-stop', (backendGrid) => {
@@ -136,10 +144,9 @@ export class Game extends Scene {
             const vol = AUDIO_SETTINGS.volumes.reelsStop; 
             const totalStopDuration = GAME_SETTINGS.timings.reelsStopDuration;
             
-            // Zachowanie proporcji zatrzymania bębnów: 0 dla pierwszego, ~43% dla drugiego, 100% dla trzeciego
             const delay1 = 0;
-            const delay2 = Math.round(totalStopDuration * 0.43); // 43% całego czasu
-            const delay3 = totalStopDuration;                   // 100% całego czasu
+            const delay2 = Math.round(totalStopDuration * 0.43); 
+            const delay3 = totalStopDuration;                  
             
             const targetReel0 = [ matrix[0][0], matrix[1][0], matrix[2][0] ].map(id => SYMBOL_MAP[id]);
             const targetReel1 = [ matrix[0][1], matrix[1][1], matrix[2][1] ].map(id => SYMBOL_MAP[id]);
@@ -163,7 +170,6 @@ export class Game extends Scene {
                 
                 const postSpinDelay = GAME_SETTINGS.timings.showWinsDelay;
 
-                // Po zatrzymaniu ostatniego bębna, pokazujemy animacje wygranych (z lekkim opóźnieniem)
                 if (backendGrid.winLineWinData && backendGrid.winLineWinData.length > 0) {
                     this.time.delayedCall(postSpinDelay, () => this.showWins(backendGrid.winLineWinData, backendGrid.grid));
                 }
@@ -173,6 +179,10 @@ export class Game extends Scene {
         EventBus.on('lebron-flash', () => {
             this.showLebronFlash();
         });
+
+        EventBus.on('fs-counter-create', (count) => this.createFreeSpinCounter(count));
+        EventBus.on('fs-counter-update', (count) => this.updateFreeSpinCounter(count));
+        EventBus.on('fs-counter-destroy', () => this.destroyFreeSpinCounter());
 
         EventBus.emit('current-scene-ready', this);
     }
@@ -196,7 +206,6 @@ export class Game extends Scene {
 
         const winningRows = new Set();
 
-        // 1. Obliczamy czas trwania - to decyduje, kiedy ZABIJEMY animacje z ekranu
         let isLongAnimation = false;
         winLineWinData.forEach(winData => {
             const symbolKey = SYMBOL_MAP[winData.symbol]?.toUpperCase();
@@ -205,9 +214,7 @@ export class Game extends Scene {
             }
         });
 
-        // 2640ms dla H1/COIN/LEBRON (pełne 31 klatek)
-        // 1280ms dla krótkich (15 klatek) - długie animacje flash i win zostaną ucięte po tym czasie
-        const animDuration = isLongAnimation ? GAME_SETTINGS.timings.winAnimationDuration : 1280;
+        const animDuration = isLongAnimation ? (GAME_SETTINGS.timings?.winAnimationDuration || 2640) : 1280;
 
         winLineWinData.forEach(winData => {
             const lineCoords = WIN_LINES[winData.winLineId];
@@ -221,10 +228,7 @@ export class Game extends Scene {
             const animKey = `${symbolKey}-win-anim`;
             const frameKey = `${symbolKey}-win-frame-1`;
 
-            console.log(`🎰 Wygrywająca linia: ID=${winData.winLineId}, Symbol=${symbolKey.toUpperCase()}`);
-
             if (!this.anims.exists(animKey)) {
-                console.warn(`⚠️ Brak animacji w grze: ${animKey}!`);
                 return;
             }
 
@@ -239,7 +243,6 @@ export class Game extends Scene {
                 animSprite.setDepth(200);
                 animSprite.setDisplaySize(colW, rowH);
                 
-                // Normalne odtwarzanie - naturalne tempo!
                 animSprite.play(animKey);
                 this.activeWinAnimations.push(animSprite);
 
@@ -249,7 +252,6 @@ export class Game extends Scene {
                 flashSprite.setBlendMode(Phaser.BlendModes.ADD);
                 flashSprite.setAlpha(0.75);
                 
-                // Normalne odtwarzanie flasha - zostanie ucięte po animDuration
                 flashSprite.play('flash-line-anim');
                 this.activeWinAnimations.push(flashSprite);
             }
@@ -302,10 +304,11 @@ export class Game extends Scene {
             strokeThickness: 8
         }).setOrigin(0.5).setDepth(1000).setScale(0);
 
-        // 1. Świecenie (Glow)
+        const maxWidth = this.scale.width * 0.90;
+        const dynamicScale = Math.min(maxWidth / textObj.width, 4);
+
         textObj.setShadow(0, 0, '#ffff00', 30, false, true);
 
-        // 2. Tęcza przesuwająca się od lewej do prawej
         const gradientProxy = { offset: 0 };
         const rainbowTween = this.tweens.add({
             targets: gradientProxy,
@@ -313,6 +316,8 @@ export class Game extends Scene {
             duration: 500, 
             repeat: -1,
             onUpdate: () => {
+                if (!textObj || !textObj.active) return; // Zapobieganie błędom drawImage
+                
                 const ctx = textObj.context;
                 const w = textObj.width || 400;
                 const gradient = ctx.createLinearGradient(0, 0, w, 0);
@@ -322,9 +327,9 @@ export class Game extends Scene {
                 const p3 = (0.66 + gradientProxy.offset) % 1;
                 
                 const stops = [
-                    { p: p1, c: '#ff0055' }, // Róż
-                    { p: p2, c: '#ffee00' }, // Żółć
-                    { p: p3, c: '#00eeff' }  // Cyjan (jasnoniebieski)
+                    { p: p1, c: '#ff0055' }, 
+                    { p: p2, c: '#ffee00' }, 
+                    { p: p3, c: '#00eeff' }  
                 ].sort((a, b) => a.p - b.p);
 
                 gradient.addColorStop(stops[0].p, stops[0].c);
@@ -335,7 +340,6 @@ export class Game extends Scene {
             }
         });
 
-        // 3. Szybkie kołysanie (wobble) lewo-prawo
         textObj.setAngle(-8);
         const wobbleTween = this.tweens.add({
             targets: textObj,
@@ -346,15 +350,14 @@ export class Game extends Scene {
             ease: 'Sine.easeInOut'
         });
 
-        // 4. Uderzenie z idealnym podziałem czasu 1/3, 1/3, 1/3
         const thirdTime = Math.round(totalTime / 3);
         const popInTime = thirdTime;
         const holdTime = thirdTime;
-        const popOutTime = totalTime - popInTime - holdTime; // Reszta dla równego rachunku
+        const popOutTime = totalTime - popInTime - holdTime; 
 
         this.tweens.add({
             targets: textObj,
-            scale: 4, 
+            scale: dynamicScale,
             ease: 'Back.out', 
             duration: popInTime,
             onComplete: () => {
@@ -374,6 +377,154 @@ export class Game extends Scene {
                 });
             }
         });
+    }
+
+    createFreeSpinCounter(initialCount) {
+        if (this.fsCounterGroup) this.fsCounterGroup.destroy(true);
+
+        const marginR = GAME_SETTINGS.hud?.fsCounterMarginRight || 80;
+        const marginB = GAME_SETTINGS.hud?.fsCounterMarginBottom || 80;
+        const x = this.scale.width - marginR;
+        const y = this.scale.height - marginB;
+
+        this.fsCounterGroup = this.add.container(x, y);
+        this.fsCounterGroup.setDepth(500);
+
+        if (!this.textures.exists('fs-rainbow-bg')) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 100; canvas.height = 100;
+            const ctx = canvas.getContext('2d');
+            const grd = ctx.createLinearGradient(0, 0, 100, 100);
+            grd.addColorStop(0, "rgba(255, 0, 128, 0.8)");
+            grd.addColorStop(0.5, "rgba(0, 200, 255, 0.8)");
+            grd.addColorStop(1, "rgba(255, 255, 0, 0.8)");
+            ctx.fillStyle = grd;
+            ctx.beginPath(); 
+            ctx.arc(50, 50, 48, 0, Math.PI * 2); 
+            ctx.fill();
+            this.textures.addCanvas('fs-rainbow-bg', canvas);
+        }
+        
+        const bgImage = this.add.image(0, 0, 'fs-rainbow-bg');
+        this.fsCounterGroup.add(bgImage);
+
+        this.tweens.add({
+            targets: bgImage,
+            angle: -360,
+            duration: 12000, 
+            repeat: -1
+        });
+
+        if (!this.textures.exists('fs-smooth-aura')) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 140; canvas.height = 140; 
+            const ctx = canvas.getContext('2d');
+            
+            const grd = ctx.createConicGradient(0, 70, 70);
+            grd.addColorStop(0, "#ff0000");
+            grd.addColorStop(0.16, "#ff00ff");
+            grd.addColorStop(0.33, "#0000ff");
+            grd.addColorStop(0.5, "#00ffff");
+            grd.addColorStop(0.66, "#00ff00");
+            grd.addColorStop(0.83, "#ffff00");
+            grd.addColorStop(1, "#ff0000");
+
+            ctx.strokeStyle = grd;
+            ctx.lineWidth = 8;
+            ctx.shadowBlur = 12; 
+            ctx.shadowColor = "rgba(255, 255, 255, 0.6)";
+
+            ctx.beginPath();
+            ctx.arc(70, 70, 52, 0, Math.PI * 2);
+            ctx.stroke();
+
+            this.textures.addCanvas('fs-smooth-aura', canvas);
+        }
+
+        const aura = this.add.image(0, 0, 'fs-smooth-aura');
+        this.fsCounterGroup.add(aura);
+        
+        this.tweens.add({
+            targets: aura,
+            angle: 360,
+            duration: 6000,
+            repeat: -1
+        });
+
+        this.fsText = this.add.text(0, 0, initialCount, {
+            fontFamily: 'Arial, black',
+            fontSize: '50px',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        this.fsText.setShadow(0, 0, '#ffffff', 5, false, true); 
+        this.fsCounterGroup.add(this.fsText);
+
+        const colorProxy = { hue: 0 };
+        this.tweens.add({
+            targets: colorProxy,
+            hue: 360,
+            duration: 4000, 
+            repeat: -1,
+            onUpdate: () => {
+                if (!this.fsText || !this.fsText.active) return; // Zapobieganie błędom drawImage
+                
+                const ctx = this.fsText.context;
+                const gradient = ctx.createLinearGradient(-25, -25, 25, 25);
+                
+                const c1 = Phaser.Display.Color.HSLToColor(colorProxy.hue / 360, 1, 0.6);
+                const c2 = Phaser.Display.Color.HSLToColor(((colorProxy.hue + 60) % 360) / 360, 1, 0.6);
+                
+                gradient.addColorStop(0, c1.rgba);
+                gradient.addColorStop(1, c2.rgba);
+                
+                this.fsText.setFill(gradient);
+            }
+        });
+
+        this.tweens.add({
+            targets: this.fsText,
+            scale: 1.15,
+            duration: 1000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+        
+        this.fsCounterGroup.setScale(0);
+        this.tweens.add({
+            targets: this.fsCounterGroup,
+            scale: 1,
+            duration: 500,
+            ease: 'Back.out'
+        });
+    }
+
+    updateFreeSpinCounter(count) {
+        if (!this.fsText) return;
+        this.fsText.setText(count);
+        
+        this.tweens.add({
+            targets: this.fsCounterGroup,
+            scale: 1.2,
+            duration: 150,
+            yoyo: true,
+            ease: 'Back.out'
+        });
+    }
+
+    destroyFreeSpinCounter() {
+        if (this.fsCounterGroup) {
+            this.tweens.add({
+                targets: this.fsCounterGroup,
+                alpha: 0,
+                scale: 0,
+                duration: 400,
+                onComplete: () => {
+                    this.fsCounterGroup.destroy(true);
+                    this.fsCounterGroup = null;
+                }
+            });
+        }
     }
 
     update() {

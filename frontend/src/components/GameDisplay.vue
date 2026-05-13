@@ -23,10 +23,10 @@ import PhaserGame from '../PhaserGame.vue';
 .reels-frame {
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0);
   border: 0.25em solid var(--btn-gold-border);
   border-radius: 0.5em;
-  box-shadow: inset 0 0 2em rgba(0, 0, 0, 0.9), var(--glow-frame);
+  box-shadow:var(--glow-frame);
   position: relative;
   overflow: hidden;
 }

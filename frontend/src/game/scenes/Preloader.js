@@ -32,6 +32,7 @@ export class Preloader extends Scene {
         this.load.audio('win-medium', 'audio/win-medium.wav');
         this.load.audio('win-high', 'audio/win-high.wav');
         this.load.audio('win-scatter', 'audio/win-scatter.wav');
+        this.load.audio('coins-sound', 'audio/coins.wav');
 
         // Load 15 animation frames for l1, l2, l3 wins
         for (let i = 1; i <= 15; i++) {
