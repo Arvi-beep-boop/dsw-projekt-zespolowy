@@ -22,6 +22,7 @@ export default defineConfig({
     base: './',
     plugins: [
         vue(),
+        Icons({ compiler: 'vue3' }),
         phasermsg()
     ],
     resolve: {
