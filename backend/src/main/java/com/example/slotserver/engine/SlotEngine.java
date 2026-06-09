@@ -34,7 +34,7 @@ public class SlotEngine {
 
         final List<SpinResult> spinResults = new ArrayList<>();
 
-        final GameState gameState = new GameState(spinRequest.getBet());
+        final GameState gameState = new GameState(spinRequest.getBet(), spinRequest.getForcedResultID());
 
         baseGameStep.execute(gameState);
         spinResults.add(baseGameStep.mapStepData(gameState));

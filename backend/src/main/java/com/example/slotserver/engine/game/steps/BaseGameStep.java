@@ -5,6 +5,7 @@ import com.example.slotserver.engine.core.ReelSpinProvider;
 import com.example.slotserver.engine.core.WinLineCalculator;
 import com.example.slotserver.engine.game.GameState;
 import com.example.slotserver.engine.game.StepResultMapper;
+import com.example.slotserver.engine.game.constants.GameConstants;
 import com.example.slotserver.model.SpinResult;
 
 import java.security.SecureRandom;
@@ -25,7 +26,8 @@ public class BaseGameStep implements GameStep {
 
     @Override
     public void execute(GameState gameState) {
-        gameState.reelStops = reelSpinProvider.getReelStops();
+        final var reelStops = GameConstants.FORCED_RESULTS.get(gameState.forcedResultID);
+        gameState.reelStops = reelStops == null ? reelSpinProvider.getReelStops() : reelStops.getForcedStops();
         reelSpinProvider.setGridReelStops(gameState.reelStops, gameState.grid);
 
         calculateLineWins(winLineCalculator, gameState);
