@@ -23,21 +23,21 @@ export const fetchInitialState = async () => {
     }
 };
 
-export const spinReelsAPI = async (betAmount) => {
+export const spinReelsAPI = async (betInCents, forcedResultID = null) => {
     try {
+        const requestBody = { bet: betInCents };
+
+        if (forcedResultID !== null) {
+            requestBody.forcedResultID = forcedResultID;
+        }
+
         const response = await fetch(`${API_URL}/spin`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ bet: betAmount })
+            body: JSON.stringify(requestBody)
         });
-        
-        if (!response.ok) {
-            if (response.status === 400) {
-                throw new Error("Odrzucono zakład: Brak środków lub nieprawidłowa stawka!");
-            }
-            throw new Error(`Błąd serwera: ${response.status}`);
-        }
 
+        if (!response.ok) throw new Error(`Błąd sieci: ${response.status}`);
         return await response.json();
     } catch (error) {
         throw error;
