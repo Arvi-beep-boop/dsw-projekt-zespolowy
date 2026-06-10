@@ -72,6 +72,14 @@ onMounted(() => {
             <img v-if="isSfxMuted" src="/assets/icons/soundOff.png" class="audio-icon is-muted" />
             <img v-else src="/assets/icons/soundOn.png" class="audio-icon" />
         </button>
+
+        <button
+            @click="handleSpin(8)"
+            :disabled="isSpinning"
+            class="forced-btn"
+        >
+            DEMO
+        </button>
     </div>
 
     <CoinFountain />
@@ -194,6 +202,25 @@ onMounted(() => {
   opacity: 0.2; 
   filter: brightness(0) invert(0); 
   transform: scale(1);
+}
+
+.forced-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: 2px solid #c5b081;
+    border-radius: 5px;
+    padding: 0 15px;
+    font-weight: bold;
+    cursor: pointer;
+    height: 55px;
+    transition: all 0.3s ease;
+    margin-left: 15px;
+}
+
+.forced-btn:disabled {
+    background-color: #7f8c8d;
+    filter: grayscale(100%);
+    cursor: not-allowed;
 }
 
 </style>
