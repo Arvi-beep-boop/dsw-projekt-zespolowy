@@ -71,6 +71,27 @@ export class Game extends Scene {
         // 2. OBSŁUGA ZDARZEŃ (EVENT BUS)
         // Łącznik między interfejsem Vue a silnikiem gry Phaser
         // ====================================================
+
+        // --- Podpięcie przycisków głośności z Vue ---
+        EventBus.on('update-music-volume', () => {
+            if (this.bgMusic && this.bgMusic.isPlaying) {
+                this.bgMusic.setVolume(AUDIO_SETTINGS.volumes.bgMusic);
+            }
+            if (this.scatterMusic && this.scatterMusic.isPlaying) {
+                this.scatterMusic.setVolume(AUDIO_SETTINGS.volumes.scatterPopup);
+            }
+        });
+
+        EventBus.on('update-sfx-volume', () => {
+            // Wycisza natychmiast trwający dźwięk kręcenia. 
+            // Krótkie dźwięki uderzeń same odczytają nowe AUDIO_SETTINGS przy kolejnym odtworzeniu.
+            const spinSounds = this.sound.getAll('reels-spin-1600');
+            spinSounds.forEach(sound => {
+                if (sound && sound.isPlaying) {
+                    sound.setVolume(AUDIO_SETTINGS.volumes.reelsSpin);
+                }
+            });
+        });
         
         // Wyświetla popup z informacją o darmowych spinach
         EventBus.on('show-free-spins-announcement', (numSpins) => {

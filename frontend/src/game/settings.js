@@ -11,7 +11,9 @@ export const AUDIO_SETTINGS = {
         // Głośność powiadomienia tekstowego oraz głównego motywu dźwiękowego trybu darmowych gier
         scatterPopup: 0.5,      
         // Poziom głośności efektu wypłacania monet podczas transferu do salda głównego
-        coinFountain: 0.7
+        coinFountain: 0.7,
+        // Poziom głośności przycisku SPIN
+        spinBtn: 1
     },
     fades: {
         // Czas (ms) zanikania muzyki z tła podczas aktywacji darmowych gier

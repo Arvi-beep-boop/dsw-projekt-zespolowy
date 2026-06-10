@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import GameLogo from './components/GameLogo.vue';
 import GameDisplay from './components/GameDisplay.vue';
 import ControlPanel from './components/ControlPanel.vue';
@@ -7,6 +7,11 @@ import CoinFountain from './components/CoinFountain.vue';
 import LebronEgg from './components/LebronEgg.vue';
 import WinIndicator from './components/WinIndicator.vue';
 import { useSlotMachine } from './composables/useSlotMachine';
+
+import { AUDIO_SETTINGS } from './game/settings.js';
+import { EventBus } from './game/EventBus.js';
+
+
 
 const { 
     balance, 
@@ -20,6 +25,37 @@ const {
     loadInitialState 
 } = useSlotMachine();
 
+const originalMusicVols = {
+    bgMusic: AUDIO_SETTINGS.volumes.bgMusic,
+    scatterPopup: AUDIO_SETTINGS.volumes.scatterPopup
+};
+
+const originalSfxVols = {
+    reelsSpin: AUDIO_SETTINGS.volumes.reelsSpin,
+    reelsStop: AUDIO_SETTINGS.volumes.reelsStop,
+    win: AUDIO_SETTINGS.volumes.win,
+    coinFountain: AUDIO_SETTINGS.volumes.coinFountain,
+    spinBtn: AUDIO_SETTINGS.volumes.spinBtn
+};
+
+const isMusicMuted = ref(false);
+const isSfxMuted = ref(false);
+
+const toggleMusic = () => {
+    isMusicMuted.value = !isMusicMuted.value;
+    AUDIO_SETTINGS.volumes.bgMusic = isMusicMuted.value ? 0 : originalMusicVols.bgMusic;
+    AUDIO_SETTINGS.volumes.scatterPopup = isMusicMuted.value ? 0 : originalMusicVols.scatterPopup;
+    EventBus.emit('update-music-volume', isMusicMuted.value);
+};
+
+const toggleSfx = () => {
+    isSfxMuted.value = !isSfxMuted.value;
+    for (const key in originalSfxVols) {
+        AUDIO_SETTINGS.volumes[key] = isSfxMuted.value ? 0 : originalSfxVols[key];
+    }
+    EventBus.emit('update-sfx-volume', isSfxMuted.value);
+};
+
 onMounted(() => {
     loadInitialState();
 });
@@ -27,6 +63,17 @@ onMounted(() => {
 
 <template>
   <div class="app-wrapper"> 
+    <div class="audio-controls">
+        <button @click="toggleMusic" class="audio-btn">
+            <img v-if="isMusicMuted" src="/assets/icons/musicOff.png" class="audio-icon is-muted" />
+            <img v-else src="/assets/icons/musicOn.png" class="audio-icon" />
+        </button>
+        <button @click="toggleSfx" class="audio-btn">
+            <img v-if="isSfxMuted" src="/assets/icons/soundOff.png" class="audio-icon is-muted" />
+            <img v-else src="/assets/icons/soundOn.png" class="audio-icon" />
+        </button>
+    </div>
+
     <CoinFountain />
     <LebronEgg />
     <GameLogo />
@@ -110,4 +157,43 @@ onMounted(() => {
   width: 100%; 
   height: 100%;
 }
+
+.audio-controls {
+  position: absolute;
+  top: var(--app-padding);
+  right: var(--app-padding);
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+.audio-btn {
+  margin: 0 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.audio-icon {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  opacity: 0.3; 
+  filter: brightness(0) invert(0);
+  transition: all 0.3s ease;
+  transform: scale(1);
+}
+
+.audio-btn:active .audio-icon,
+.audio-icon.is-muted {
+  opacity: 0.2; 
+  filter: brightness(0) invert(0); 
+  transform: scale(1);
+}
+
 </style>
