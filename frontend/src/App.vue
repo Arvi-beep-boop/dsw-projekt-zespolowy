@@ -7,6 +7,7 @@ import CoinFountain from './components/CoinFountain.vue';
 import LebronEgg from './components/LebronEgg.vue';
 import WinIndicator from './components/WinIndicator.vue';
 import { useSlotMachine } from './composables/useSlotMachine';
+import SettingsPanel from './components/SettingsPanel.vue';
 
 import { AUDIO_SETTINGS } from './game/settings.js';
 import { EventBus } from './game/EventBus.js';
@@ -41,6 +42,13 @@ const originalSfxVols = {
 const isMusicMuted = ref(false);
 const isSfxMuted = ref(false);
 
+const isSettingsPanelOpen = ref(false);
+
+const toggleSettingsPanel = () => {
+    isSettingsPanelOpen.value = !isSettingsPanelOpen.value;
+    console.log("Panel ustawień:", isSettingsPanelOpen.value);
+};
+
 const toggleMusic = () => {
     isMusicMuted.value = !isMusicMuted.value;
     AUDIO_SETTINGS.volumes.bgMusic = isMusicMuted.value ? 0 : originalMusicVols.bgMusic;
@@ -63,16 +71,25 @@ onMounted(() => {
 
 <template>
   <div class="app-wrapper"> 
-    <div class="audio-controls">
-        <button @click="toggleMusic" class="audio-btn">
-            <img v-if="isMusicMuted" src="/assets/icons/musicOff.png" class="audio-icon is-muted" />
-            <img v-else src="/assets/icons/musicOn.png" class="audio-icon" />
+    <div class="right-panel-controls">
+        <button @click="toggleMusic" class="panel-btn">
+            <img v-if="isMusicMuted" src="/assets/icons/musicOff.png" class="panel-icon is-muted" />
+            <img v-else src="/assets/icons/musicOn.png" class="panel-icon" />
         </button>
-        <button @click="toggleSfx" class="audio-btn">
-            <img v-if="isSfxMuted" src="/assets/icons/soundOff.png" class="audio-icon is-muted" />
-            <img v-else src="/assets/icons/soundOn.png" class="audio-icon" />
+        <button @click="toggleSfx" class="panel-btn">
+            <img v-if="isSfxMuted" src="/assets/icons/soundOff.png" class="panel-icon is-muted" />
+            <img v-else src="/assets/icons/soundOn.png" class="panel-icon" />
+        </button>
+        <button @click="toggleSettingsPanel" class="panel-btn">
+            <img src="/assets/icons/settings.png" class="panel-icon" />
         </button>
     </div>
+
+    <SettingsPanel 
+        :is-open="isSettingsPanelOpen" 
+        :is-spinning="isSpinning"
+        @force-spin="handleSpin" 
+    />
 
     <CoinFountain />
     <LebronEgg />
@@ -101,6 +118,9 @@ onMounted(() => {
       />
 
     </div>
+    <img src="/assets/icons/musicOff.png" style="display: none;" />
+    <img src="/assets/icons/soundOff.png" style="display: none;" />
+    <img src="/assets/sztosy.png" style="display: none;" />
   </div>
 </template>
 
@@ -158,17 +178,18 @@ onMounted(() => {
   height: 100%;
 }
 
-.audio-controls {
+.right-panel-controls {
   position: absolute;
   top: var(--app-padding);
   right: var(--app-padding);
   display: flex;
-  gap: 10px;
+  flex-direction: row;
+  gap: 15px;
   z-index: 100;
 }
 
-.audio-btn {
-  margin: 0 10px;
+.panel-btn {
+  margin: 0;
   background: none;
   border: none;
   padding: 0;
@@ -179,9 +200,9 @@ onMounted(() => {
   outline: none;
 }
 
-.audio-icon {
-  width: 55px;
-  height: 55px;
+.panel-icon {
+  width: 45px;
+  height: 45px;
   object-fit: contain;
   opacity: 0.3; 
   filter: brightness(0) invert(0);
@@ -189,11 +210,14 @@ onMounted(() => {
   transform: scale(1);
 }
 
-.audio-btn:active .audio-icon,
-.audio-icon.is-muted {
+.panel-btn:active .panel-icon,
+.panel-icon.is-muted {
   opacity: 0.2; 
   filter: brightness(0) invert(0); 
   transform: scale(1);
 }
 
+.panel-btn:last-child {
+  margin-left: -10px;
+}
 </style>

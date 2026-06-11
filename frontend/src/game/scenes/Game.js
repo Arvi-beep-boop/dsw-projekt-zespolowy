@@ -30,7 +30,7 @@ export class Game extends Scene {
         if (!this.sound.get('bg-music')) {
             this.bgMusic = this.sound.add('bg-music', { 
                 loop: true,
-                volume: AUDIO_SETTINGS.volumes.bgMusic || 0.1
+                volume: AUDIO_SETTINGS.volumes.bgMusic ?? 0.1
             });
             this.bgMusic.play();
         }
@@ -129,7 +129,7 @@ export class Game extends Scene {
                 this.tweens.add({
                     targets: this.bgMusic,
                     volume: 0,
-                    duration: AUDIO_SETTINGS.fades?.bgMusicFadeOut || 1000 
+                    duration: AUDIO_SETTINGS.fades?.bgMusicFadeOut ?? 1000 
                 });
             }
         });
@@ -139,7 +139,7 @@ export class Game extends Scene {
             if (!this.scatterMusic || !this.scatterMusic.isPlaying) {
                 if (this.scatterMusic) this.scatterMusic.destroy();
                 this.scatterMusic = this.sound.add('win-scatter', { 
-                    volume: AUDIO_SETTINGS.volumes?.scatterPopup || 0.5 
+                    volume: AUDIO_SETTINGS.volumes?.scatterPopup ?? 0.5 
                 }); 
                 this.scatterMusic.play();
             }
@@ -151,7 +151,7 @@ export class Game extends Scene {
                 this.tweens.add({
                     targets: this.scatterMusic,
                     volume: 0,
-                    duration: AUDIO_SETTINGS.fades.scatterFadeOut || 750,
+                    duration: AUDIO_SETTINGS.fades.scatterFadeOut ?? 750,
                     onComplete: () => {
                         this.scatterMusic.stop(); 
                         this.scatterMusic.destroy();
@@ -163,8 +163,8 @@ export class Game extends Scene {
             if (this.bgMusic) {
                 this.tweens.add({
                     targets: this.bgMusic,
-                    volume: AUDIO_SETTINGS.volumes.bgMusic || 0.1,
-                    duration: AUDIO_SETTINGS.fades.bgMusicFadeIn || 750 
+                    volume: AUDIO_SETTINGS.volumes.bgMusic ?? 0.1,
+                    duration: AUDIO_SETTINGS.fades.bgMusicFadeIn ?? 750 
                 });
             }
         });
@@ -238,6 +238,7 @@ export class Game extends Scene {
         EventBus.on('fs-counter-destroy', () => this.destroyFreeSpinCounter());
 
         EventBus.emit('current-scene-ready', this);
+        
     }
     
     // ====================================================

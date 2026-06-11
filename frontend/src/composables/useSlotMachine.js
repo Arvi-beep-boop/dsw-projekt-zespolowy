@@ -110,7 +110,7 @@ export function useSlotMachine() {
     // Zbiera dane z API i nadzoruje całą asynchroniczną 
     // sekwencję zdarzeń pomiędzy silnikiem graficznym a Vue.
     // ====================================================
-    const handleSpin = async () => {
+    const handleSpin = async (forcedResultID = null) => {
         if (isSpinning.value) return;
 
         // Czyszczenie ekranu i liczników przed nowym rzutem
@@ -187,7 +187,7 @@ export function useSlotMachine() {
                 await new Promise(r => setTimeout(r, 200)); 
                 return mockScatterResponse;
             }
-            return await spinReelsAPI(backendBet);
+            return await spinReelsAPI(backendBet, forcedResultID);
         };
 
         // Zleca Phaserowi start obrotu, czeka określony czas 

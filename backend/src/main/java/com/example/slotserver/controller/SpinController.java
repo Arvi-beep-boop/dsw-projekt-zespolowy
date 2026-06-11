@@ -6,7 +6,11 @@ import com.example.slotserver.model.SpinRequest;
 import com.example.slotserver.model.SpinResponse;
 import com.example.slotserver.model.SpinResult;
 import com.example.slotserver.service.SpinService;
+
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -49,4 +53,7 @@ public class SpinController {
         spinResult.reelStops = new int[]{41, 2, 35};
         return new SpinResponse(List.of(spinResult), spinService.getBalance());
     }
+    
 }
+
+
