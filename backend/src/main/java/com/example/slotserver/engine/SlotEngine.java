@@ -22,7 +22,7 @@ public class SlotEngine {
     final BaseGameStep baseGameStep;
     final FreeGameStep freeGameStep;
     final SecureRandom ro = new SecureRandom();
-    final WinLineCalculator winLineCalculator;
+    final WinLineCalculator winLineCalculator; 
 
     public SlotEngine() {
         winLineCalculator = new WinLineCalculator(GameConstants.WIN_LINES, GameConstants.PAY_TABLE, SymbolCodes.WILD, SymbolCodes.SCATTER);

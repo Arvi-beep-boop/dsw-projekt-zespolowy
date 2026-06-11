@@ -13,7 +13,9 @@ const config = {
         width: '100%',
         height: '100%'
     },
-    backgroundColor: '#028af8',
+    render: {
+        transparent: true
+    },
     scene: [
         Boot,
         Preloader,

@@ -23,12 +23,18 @@ export const fetchInitialState = async () => {
     }
 };
 
-export const spinReelsAPI = async (betAmount) => {
+export const spinReelsAPI = async (betAmount, forcedResultID = null) => {
     try {
+        const payload = { bet: betAmount };
+        // Jeśli przesłano ID z menu, dodajemy je do requesta
+        if (forcedResultID !== null) {
+            payload.forcedResultID = forcedResultID;
+        }
+
         const response = await fetch(`${API_URL}/spin`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ bet: betAmount })
+            body: JSON.stringify(payload)
         });
         
         if (!response.ok) {
