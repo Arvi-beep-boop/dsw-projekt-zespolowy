@@ -1,12 +1,12 @@
 <script setup>
-const audio = new Audio('/assets/audio/logoSound.mp3');
-audio.volume = 0.8;
+//const audio = new Audio('/assets/audio/logoSound.mp3');
+//audio.volume = 0.8;
 
-const playLogoSound = () => {
-  if (!audio.paused) return;
-  audio.currentTime = 0;
-  audio.play();
-};
+//const playLogoSound = () => {
+//  if (!audio.paused) return;
+//  audio.currentTime = 0;
+//  audio.play();
+//};
 </script>
 
 <template>

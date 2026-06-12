@@ -238,7 +238,38 @@ export class Game extends Scene {
         EventBus.on('fs-counter-destroy', () => this.destroyFreeSpinCounter());
 
         EventBus.emit('current-scene-ready', this);
+        this.scale.on('resize', (gameSize) => {
+        const newW = gameSize.width;
+        const newH = gameSize.height;
         
+        const newColW = Math.ceil(newW / 3);
+        const newRowH = Math.ceil(newH / 3);
+
+        // 1. Przesunięcie bębnów na nowe pozycje X
+        this.reel1.setPosition(0, 0);
+        this.reel2.setPosition(newColW, 0);
+        this.reel3.setPosition(newColW * 2, 0);
+
+        // 2. Skalowanie bębnów i symboli w locie
+        this.reels.forEach(reel => {
+            reel.symbolWidth = newColW;
+            reel.symbolHeight = newRowH;
+            reel.activeSymbols.forEach((symbol, idx) => {
+                symbol.setDisplaySize(newColW, newRowH);
+                symbol.y = (idx - 1) * newRowH;
+            });
+        });
+
+        // 3. Przerysowanie linii siatki
+        gridGfx.clear();
+        gridGfx.lineStyle(4, 0xc5b081, 0.4);
+        gridGfx.beginPath();
+        gridGfx.moveTo(newColW, 0); gridGfx.lineTo(newColW, newH);
+        gridGfx.moveTo(newColW * 2, 0); gridGfx.lineTo(newColW * 2, newH);
+        gridGfx.moveTo(0, newRowH); gridGfx.lineTo(newW, newRowH);
+        gridGfx.moveTo(0, newRowH * 2); gridGfx.lineTo(newW, newRowH * 2);
+        gridGfx.strokePath();
+    });
     }
     
     // ====================================================

@@ -22,7 +22,7 @@ export function useSlotMachine() {
     const balance = ref(0);
     const win = ref(0);
     const currentBet = ref(1);
-    const availableBets = ref([1, 2, 5, 10, 20, 50, 100, 500, 1000]);
+    const availableBets = ref([1, 2, 5, 10, 20, 50, 100]);
     const isSpinning = ref(false);
     
     // ====================================================

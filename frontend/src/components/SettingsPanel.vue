@@ -28,7 +28,7 @@ const forceResult = (type) => {
 <template>
   <div v-if="isOpen" class="settings-panel">
     
-    <h2 class="god-mode-title">GOD MODE</h2>
+    <h2 class="god-mode-title">GOD<span class="mobile-break"> </span>MODE</h2>
     
     <div class="buttons-container">
       <div class="btn-row">
@@ -57,14 +57,15 @@ const forceResult = (type) => {
   position: absolute;
   top: calc(var(--app-padding) + 55px);
   right: var(--app-padding);
-  height: 50vh;
-  width: 44vh;
+  width: 335px;
+  height: 480px;
   background-color: rgba(131, 131, 131, 0.329);
   backdrop-filter: blur(8px);
   z-index: 9999;
   padding: 20px;
   display: flex;
   flex-direction: column;
+  transform: translateX(5px);
 }
 
 
@@ -91,7 +92,7 @@ const forceResult = (type) => {
   font-family: sans-serif;
   font-size: 16px;
   font-weight: bold;
-  transition: transform 0.1s ease, opacity 0.3s ease;
+  transition: all 0.1s ease;
 }
 
 .force-btn:active:not(:disabled) {
@@ -120,6 +121,7 @@ const forceResult = (type) => {
   margin-bottom: -20px;
   margin-top: auto;
   object-fit: cover;
+  padding-top: 10px;
 }
 
 .god-mode-title {
@@ -127,11 +129,61 @@ const forceResult = (type) => {
   text-align: center;
   margin: 0 0 20px 0;
   font-family: 'Arial Black', sans-serif;
-  font-size: 32px; /* Rozmiar tekstu */
+  font-size: 28px; /* Rozmiar tekstu */
   font-weight: 900;
   letter-spacing: 4px;
   text-transform: uppercase;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(0, 195, 255, 0.6); 
   z-index: 2;
+}
+
+.force-btn:hover:not(:disabled) {
+  background-color: var(--btn-gold-hover);
+  border-color: var(--btn-gold-border-hover);
+  box-shadow: var(--glow-frame);
+  color: var(--btn-gold-text-glow);
+  text-shadow: var(--glow-text);
+}
+
+.mobile-break {
+  display: inline;
+}
+
+@media (max-width: 1850px) {
+  .settings-panel {
+    width: max-content;
+    height: auto;
+    padding: 10px;
+    transform: translateX(0);
+  }
+
+  .bottom-img {
+    display: none;
+  }
+
+  .mobile-break {
+    display: block;
+  }
+
+  .god-mode-title {
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .buttons-container {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .btn-row {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .force-btn, .small-btn, .wide-btn {
+    width: 100px;
+    aspect-ratio: auto;
+    padding: 10px;
+  }
 }
 </style>

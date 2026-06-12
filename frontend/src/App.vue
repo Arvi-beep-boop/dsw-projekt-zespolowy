@@ -152,7 +152,7 @@ onMounted(() => {
   max-width uzależnia szerokość od bieżącej wysokości, 
   blokując deformację proporcji na monitorach panoramicznych.*/
   aspect-ratio: 4 / 3;
-  width: var(--available-width);
+  width: calc(var(--available-width) * 0.66);
   max-height: var(--available-height);
   max-width: calc(var(--available-height) * (4 / 3));
   display: flex;
