@@ -57,8 +57,7 @@ const forceResult = (type) => {
   position: absolute;
   top: calc(var(--app-padding) + 55px);
   right: var(--app-padding);
-  height: 50vh;
-  width: 44vh;
+  width: 36vh;
   background-color: rgba(131, 131, 131, 0.329);
   backdrop-filter: blur(8px);
   z-index: 9999;
@@ -91,7 +90,7 @@ const forceResult = (type) => {
   font-family: sans-serif;
   font-size: 16px;
   font-weight: bold;
-  transition: transform 0.1s ease, opacity 0.3s ease;
+  transition: all 0.1s ease;
 }
 
 .force-btn:active:not(:disabled) {
@@ -120,6 +119,7 @@ const forceResult = (type) => {
   margin-bottom: -20px;
   margin-top: auto;
   object-fit: cover;
+  padding-top: 10px;
 }
 
 .god-mode-title {
@@ -127,11 +127,19 @@ const forceResult = (type) => {
   text-align: center;
   margin: 0 0 20px 0;
   font-family: 'Arial Black', sans-serif;
-  font-size: 32px; /* Rozmiar tekstu */
+  font-size: 28px; /* Rozmiar tekstu */
   font-weight: 900;
   letter-spacing: 4px;
   text-transform: uppercase;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(0, 195, 255, 0.6); 
   z-index: 2;
+}
+
+.force-btn:hover:not(:disabled) {
+  background-color: var(--btn-gold-hover);
+  border-color: var(--btn-gold-border-hover);
+  box-shadow: var(--glow-frame);
+  color: var(--btn-gold-text-glow);
+  text-shadow: var(--glow-text);
 }
 </style>
